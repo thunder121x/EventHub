@@ -1,0 +1,42 @@
+:root {
+    --text: #090512;
+    /* Darker, neutral black for better readability */
+    --background: #F5F3FC;
+    /* Softer off-white to reduce strain on the eyes */
+    --primary: #6840C6;
+    /* Slightly deeper purple for a more elegant primary color */
+    --secondary: #D09AE1;
+    /* Softer secondary color to complement the primary */
+    --accent: #C974D5;
+    /* Brighter, more energetic accent to create contrast */
+    --gray: #6B7D8D;
+
+    /* Typography */
+    --headline-font: 'Kavoon', cursive;
+    --poppins-font: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--secondary);
+    color: var(--text);
+    font-family: var(--poppins-font);
+}
+.bg-whitex {
+    --tw-bg-opacity: 1;
+    background-color: var(--background)
+        /* #ffffff */
+    ;
+}
+.input-field {
+    @apply w-full px-16 py-6 border border-gray focus:outline-none focus:border-primary rounded-[50px];
+}
+
+.input-field::placeholder {
+    color: var(--gray);
+    /* Use your custom primary color */
+}
+
+.search-button {
+    @apply bg-primary text-white px-16 py-2 hover:bg-primary rounded-[50px];
+}
