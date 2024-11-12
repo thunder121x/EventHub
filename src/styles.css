@@ -1,0 +1,124 @@
+:root {
+    --text: #090512; /* Darker, neutral black for better readability */
+    --background: #F5F3FC; /* Softer off-white to reduce strain on the eyes */
+    --primary: #6840C6; /* Slightly deeper purple for a more elegant primary color */
+    --secondary: #D09AE1; /* Softer secondary color to complement the primary */
+    --accent: #C974D5; /* Brighter, more energetic accent to create contrast */
+    --gray: #6B7D8D;
+
+    /* Typography */
+    --headline-font: 'Kavoon', cursive;
+    --poppins-font: 'Poppins', sans-serif;
+
+    /* Typography Sizes */
+    --display1: 40px;
+    --display2: 40px;
+    --heading1: 39px;
+    --heading2: 24px;
+    --heading3: 16px;
+    --heading4: 14px;
+    --heading5: 10px;
+    --search: 20px;
+    --paragraph1: 20px;
+    --paragraph2: 15px;
+    --paragraph3: 13px;
+    --footer: 16px;
+}
+
+body {
+    font-family: var(--poppins-font);
+    background-color: var(--secondary);
+    color: var(--text);
+}
+
+/* ... other styles ... */
+
+.display1 {
+    font-family: var(--poppins-font);
+    font-weight: bold;
+    font-size: var(--display1);
+}
+
+.display2 {
+    font-family: var(--poppins-font);
+    font-weight: 600; /* Semi-Bold */
+    font-size: var(--display2);
+}
+
+.heading1 {
+    font-family: var(--poppins-font);
+    font-weight: bold;
+    font-size: var(--heading1);
+}
+
+.heading2 {
+    font-family: var(--poppins-font);
+    font-weight: bold;
+    font-size: var(--heading2);
+}
+
+.heading3 {
+    font-family: var(--poppins-font);
+    font-weight: bold;
+    font-size: var(--heading3);
+}
+
+.heading4 {
+    font-family: var(--poppins-font);
+    font-weight: 600; /* Semi-Bold */
+    font-size: var(--heading4);
+}
+
+.heading5 {
+    font-family: var(--poppins-font);
+    font-weight: 600; /* Semi-Bold */
+    font-size: var(--heading5);
+}
+
+.search {
+    font-family: var(--poppins-font);
+    font-weight: bold;
+    font-size: var(--search);
+}
+
+.paragraph1 {
+    font-family: var(--poppins-font);
+    font-weight: normal;
+    font-size: var(--paragraph1);
+}
+
+.paragraph2 {
+    font-family: var(--poppins-font);
+    font-weight: normal;
+    font-size: var(--paragraph2);
+}
+
+.paragraph3 {
+    font-family: var(--poppins-font);
+    font-weight: normal;
+    font-size: var(--paragraph3);
+}
+
+.footer {
+    font-family: var(--poppins-font);
+    font-weight: 600; /* Semi-Bold */
+    font-size: var(--footer);
+}
+
+.input-field {
+    @apply w-full px-16 py-6 border border-gray focus:outline-none focus:border-primary rounded-[50px] bg-white;
+}
+
+.input-field::placeholder { 
+    color: var(--gray);
+    /* Use your custom primary color */
+}
+.search-button {
+  @apply bg-primary text-white px-4 py-2 rounded-md hover:bg-primary;
+}
+
+
+.search-button::placeholder {
+    color: var(--gray);
+    /* Use your custom primary color */
+}
