@@ -2,9 +2,14 @@ import React from "react";
 import "../styles.css";
 import login_bg from "../assets/header.png";
 import Profile from "../assets/Profile.jpg";
+import { HashLink } from "react-router-hash-link";
+import Navbar from "./Navbar.js";
+import logo from "../assets/logo.png";
 
 const Login = () => {
   return (
+    <div>
+    <Navbar isScrolled={false} onShowing={true}/>
     <div
       style={{
         backgroundImage: `url(${login_bg})`,
@@ -15,6 +20,16 @@ const Login = () => {
       className="min-h-screen flex items-center justify-center p-4 restrictedFeature"
     >
       <div className="max-w-lg max-h-fit w-full space-y-6 bg-white p-8 rounded-lg shadow-lg overlayForm">
+        <HashLink
+          smooth
+          to="/#top"
+          className="flex items-center text-display-1 font-headline"
+        >
+        <div className="flex items-center">
+          <img src={logo} alt="EventHub logo" className="mr-2 w-8 h-8" />
+          <button className="paragraph2 text-primary mt-1">EventHub</button>
+        </div>
+        </HashLink>
         {/* Circular Image */}
         <div className="flex justify-center">
           <div className="w-[137px] h-[137px] overflow-hidden rounded-full ">
@@ -70,16 +85,15 @@ const Login = () => {
 
           {/* Sign Up Link */}
           <div className="text-center">
-            <span className="paragraph2">Not a member? </span>
-            <a
-              href="#"
-              className="text-primary hover:text-primary paragraph2 font-medium"
-            >
+            <span className="paragraph2">
+              Not a member? </span>
+            <HashLink smooth to="/SignUp" className="paragraph2 text-primary hover:text-secondary">
               Sign up now
-            </a>
+            </HashLink>
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };

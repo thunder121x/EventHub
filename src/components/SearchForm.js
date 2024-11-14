@@ -49,7 +49,7 @@ function SearchForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate(`/filterpage`, {
+    navigate(`/Filter`, {
       state: {
         workshopType: selectedWorkshopType,
         province: selectedProvince,

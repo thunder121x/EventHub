@@ -5,6 +5,7 @@
     --secondary: #D09AE1; /* Softer secondary color to complement the primary */
     --accent: #C974D5; /* Brighter, more energetic accent to create contrast */
     --gray: #6B7D8D;
+    --lightgray: #D0D5DD;
     --white: #FEFEFE;
 
     /* Typography */
@@ -142,11 +143,6 @@ h1 {
 }
 
 
-.icon {
-  width: 14px;
-  height: 14px;
-}
-
 .restrictedFeature {
   /* ... other styles for the feature ... */
   position: relative;
@@ -172,5 +168,29 @@ h1 {
   width: 80%; /* Adjust width as needed */
   height: 80%; /* Adjust height as needed */
   background-color: white;
+  z-index: 2;
+}
+
+
+.tests {
+    position: relative;
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60%;
+  height: 100%;
+  /* background-color: black; */
+  z-index: 1; 
+}
+
+.testss {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* transform: translate(-50%, -50%); */
+  width: 50%; /* Adjust width as needed */
+  height: 100%; /* Adjust height as needed */
+  /* background-color: white; */
   z-index: 2;
 }

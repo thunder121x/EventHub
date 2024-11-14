@@ -16,6 +16,7 @@ import Sign_up from "./components/Sign_up";
 
 function App() {
   const [navbarBg, setNavbarBg] = useState(false);
+  const [navbarShowOn, setNavbarShowOn] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -26,7 +27,11 @@ function App() {
       // Set navbar background on initial load and scroll
       setNavbarBg(
         window.scrollY > headerHeight ||
-          ["/ewallet", "/EventDetail"].includes(location.pathname)
+          ["/E-Wallet", "/EventDetail"].includes(location.pathname)
+      );
+
+      setNavbarShowOn(
+        !["/Login", "/SignUp"].includes(location.pathname)
       );
     };
 
@@ -40,7 +45,7 @@ function App() {
 
   return (
     <div className="bg-background min-h-screen">
-      <Navbar isScrolled={navbarBg} />
+      <Navbar isScrolled={navbarBg} onShowing={navbarShowOn} />
       <Routes>
         <Route path="/" element={<Homepage />} />
         {/* <Route path="/reservation" element={<Reservation_1 />} />
@@ -48,10 +53,10 @@ function App() {
         <Route path="/SearchBar" element={<Homepage />} />
         <Route path="/ExploreWorkshops" element={<Homepage />} />
         <Route path="/AboutUs" element={<AboutUs />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Sign_up />} />
-        <Route path="/filterpage" element={<FilterPageWithState />} />
-        <Route path="/ewallet" element={<EWallet />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/SignUp" element={<Sign_up />} />
+        <Route path="/Filter" element={<FilterPageWithState />} />
+        <Route path="/E-Wallet" element={<EWallet />} />
         <Route path="/EventDetail" element={<EventDetail />} />
       </Routes>
       {/* <Footer /> */}
