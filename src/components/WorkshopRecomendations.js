@@ -4,7 +4,7 @@ import WorkshopRecommendationBox from "./WorkshopRecomendationBox";
 
 function WorkshopRecommendations() {
   return (
-    <div className="p-20">
+    <div className="px-20">
       {/* <div className="border-l-2 border-primary h-10 mx-2 rounded-l-md"></div>
       <span className="text-heading-2 font-poppins">Workshop</span> */}
       <div className="flex justify-center">

@@ -5,7 +5,6 @@ import dropdownIcon from "../assets/emoji/dropdown.png"; // Ensure correct path
 import calendarIcon from "../assets/emoji/calendar.png";
 import "react-date-range/dist/styles.css"; // Main CSS
 import "react-date-range/dist/theme/default.css"; // Theme CSS
-import { addYears } from "date-fns";
 
 
 function SearchForm() {
@@ -62,8 +61,8 @@ function SearchForm() {
 
   return (
     <div className="container mx-auto max-w-screen-xl">
-      <div className="flex flex-col items-center justify-center h-screen">
-        <div className="border border-gray-300 py-12 px-24 rounded-[25px] shadow-lg">
+      <div className="flex flex-col items-center pb-24">
+        <div className="border border-primary py-12 px-24 rounded-[25px] shadow-lg">
           <div className="w-full max-w-md">
             <form onSubmit={handleSubmit}>
               {/* Workshop Type Dropdown */}

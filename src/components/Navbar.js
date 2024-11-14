@@ -1,8 +1,6 @@
 import "../styles.css";
 import React from "react";
-// import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
-
 import { HashLink } from "react-router-hash-link";
 
 function Navbar({ isScrolled }) {
@@ -15,7 +13,9 @@ function Navbar({ isScrolled }) {
       } p-4 fixed top-0 left-0 w-full z-10 transition-colors duration-300 navtext`}
     >
       <div className="container mx-auto flex justify-between items-center">
-        <HashLink smooth to="/#top"
+        <HashLink
+          smooth
+          to="/#top"
           className="flex items-center text-display-1 font-headline"
         >
           <img src={logo} alt="Logo" className="w-8 h-8 mr-2" />

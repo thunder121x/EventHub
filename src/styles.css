@@ -5,6 +5,7 @@
     --secondary: #D09AE1; /* Softer secondary color to complement the primary */
     --accent: #C974D5; /* Brighter, more energetic accent to create contrast */
     --gray: #6B7D8D;
+    --white: #FEFEFE;
 
     /* Typography */
     --headline-font: 'Kavoon', cursive;
@@ -114,11 +115,62 @@ body {
     /* Use your custom primary color */
 }
 .search-button {
-  @apply bg-primary text-white px-4 py-2 rounded-md hover:bg-primary;
+  @apply bg-primary text-white p-3 rounded-[30px] hover:bg-primary w-2/3;
 }
 
 
 .search-button::placeholder {
     color: var(--gray);
     /* Use your custom primary color */
+}
+
+.event-detail-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.breadcrumb a {
+  color: #8a2be2;
+  text-decoration: none;
+}
+
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+
+.icon {
+  width: 14px;
+  height: 14px;
+}
+
+.restrictedFeature {
+  /* ... other styles for the feature ... */
+  position: relative;
+}
+
+.restrictedFeature::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.7; /* Adjust opacity as needed */
+  z-index: 1; 
+}
+
+.overlayForm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%; /* Adjust width as needed */
+  height: 80%; /* Adjust height as needed */
+  background-color: white;
+  z-index: 2;
 }

@@ -11,7 +11,7 @@ module.exports = {
         text: "var(--text)",
         background: "var(--background)",
         gray: "var(--gray)",
-        
+        white: "var(--white)",
       },
     },
   },
