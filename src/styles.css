@@ -7,9 +7,10 @@
     --gray: #6B7D8D;
     --lightgray: #D0D5DD;
     --white: #FEFEFE;
+    --lightblack: #333;
 
     /* Typography */
-    --headline-font: 'Kavoon', cursive;
+    /* --headline-font: 'Kavoon', cursive; */
     --poppins-font: 'Poppins', sans-serif;
 
     /* Typography Sizes */
@@ -28,7 +29,7 @@
 }
 
 body {
-    font-family: var(--poppins-font);
+    font-family: 'Poppins', sans-serif;
     background-color: var(--secondary);
     color: var(--text);
 }
@@ -93,6 +94,7 @@ body {
     font-family: var(--poppins-font);
     font-weight: normal;
     font-size: var(--paragraph2);
+    line-height: 3; /* Equivalent to `leading-relaxed` in Tailwind */
 }
 
 .paragraph3 {

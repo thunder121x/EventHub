@@ -4,6 +4,9 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Poppins", "sans-serif"],
+      },
       colors: {
         primary: "var(--primary)",
         secondary: "var(--secondary)",
@@ -13,6 +16,7 @@ module.exports = {
         gray: "var(--gray)",
         lightgray: "var(--lightgray)",
         white: "var(--white)",
+        lightblack: "var(--lightblack)",
       },
     },
   },

@@ -9,9 +9,15 @@ const StarRating = ({ rating }) => {
   return (
     <div className="flex items-center">
       {[...Array(fullStars)].map((_, i) => (
-        <img key={i} src={starIcon} alt="Star" className="icon" />
+        <img key={i} src={starIcon} alt="Star" className="w-[30px] h-[25px]" />
       ))}
-      {halfStar && <img src={halfStarIcon} alt="Half Star" className="icon" />}
+      {halfStar && (
+        <img
+          src={halfStarIcon}
+          alt="Half Star"
+          className=" w-[30px] h-[25px]"
+        />
+      )}
     </div>
   );
 };

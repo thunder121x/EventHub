@@ -66,7 +66,7 @@ function FilterPageWithState() {
 
 function FilterPage({ workshopType, province, startDate, endDate }) {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100 text-black">
+    <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="flex items-center bg-white py-1 px-4 rounded-[21px] shadow-lg max-w">
         {/* Province */}
         <div className="flex items-center px-4">

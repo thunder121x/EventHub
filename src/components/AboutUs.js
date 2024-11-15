@@ -20,7 +20,7 @@ const AboutUs = () =>{
               </h1>
               <div className="bg-primary opacity-60 w-1/12 h-1 my-4 mr-2 rounded"></div>
             </div>
-            <p className="text-[20px] text-black pb-12 mb-8 px-96">
+            <p className="text-[20px] pb-12 mb-8 px-96">
               We provide everything you need to book, manage, and participate in
               workshops with ease. Our platform makes connecting and learning
               effortless, helping you gain new skills, meet like-minded people,
