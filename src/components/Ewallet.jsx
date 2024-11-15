@@ -8,6 +8,7 @@ import Loading from "../assets/Loading.png";
 import Mastercard from "../assets/Mastercard.png";
 import logo from "../assets/eventhub_logo.png";
 import visa from "../assets/VISA.png";
+import LeftNav from "./LeftNav";
 
 const SuccessModal = ({ isOpen, onClose, amount }) => {
   if (!isOpen) return null;
@@ -20,14 +21,14 @@ const SuccessModal = ({ isOpen, onClose, amount }) => {
         </div>
 
         <h2 className="heading2 text-text mb-2">Top Up Successful!</h2>
-        <p className="paragraph1 text-gray mb-4">
+        <p className="paragraph1 text-lightgray mb-4">
           {amount} Baht has been added to your wallet
         </p>
 
         <div className="rounded-lg p-4 mb-6">
-          <p className="paragraph2 text-gray mb-2">Transaction Details</p>
+          <p className="paragraph2 text-lightgray mb-2">Transaction Details</p>
           <p className="heading3">{amount} Baht</p>
-          <p className="paragraph2 text-gray">
+          <p className="paragraph2 text-lightgray">
             {new Date().toLocaleDateString()} -{" "}
             {new Date().toLocaleTimeString()}
           </p>
@@ -51,13 +52,13 @@ const ProcessingModal = ({ isOpen }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-8 max-w-md w-full">
         <h2 className="heading2 text-text mb-4">Processing Your Transaction</h2>
-        <p className="paragraph1 text-gray mb-4">Please wait...</p>
+        <p className="paragraph1 text-lightgray mb-4">Please wait...</p>
 
         <div className="flex justify-center mb-6">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
 
-        <div className="paragraph2 text-gray text-center">
+        <div className="paragraph2 text-lightgray text-center">
           We are currently verifying your transaction details.
           <br />
           This may take a moment. Do not refresh the page.
@@ -95,7 +96,7 @@ const Ewallet = ({ isOpen, onClose, onSave }) => {
             <input
               type="text"
               placeholder="1234 5678 9123 4567"
-              className="w-full p-2 border border-gray rounded-lg focus:outline-none focus:border-primary"
+              className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -105,7 +106,7 @@ const Ewallet = ({ isOpen, onClose, onSave }) => {
               <input
                 type="text"
                 placeholder="07 / 27"
-                className="w-full p-2 border border-gray rounded-lg focus:outline-none focus:border-primary"
+                className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
               />
             </div>
             <div className="w-1/2">
@@ -113,7 +114,7 @@ const Ewallet = ({ isOpen, onClose, onSave }) => {
               <input
                 type="text"
                 placeholder="123"
-                className="w-full p-2 border border-gray rounded-lg focus:outline-none focus:border-primary"
+                className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -123,11 +124,11 @@ const Ewallet = ({ isOpen, onClose, onSave }) => {
             <input
               type="text"
               placeholder="John Doe"
-              className="w-full p-2 border border-gray rounded-lg focus:outline-none focus:border-primary"
+              className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
 
-          <p className="paragraph2 text-gray mt-4">
+          <p className="paragraph2 text-lightgray mt-4">
             The system will deduct 1 baht from your card for identity
             verification. You will receive this amount back within 14 business
             days.
@@ -137,7 +138,7 @@ const Ewallet = ({ isOpen, onClose, onSave }) => {
         <div className="flex justify-end gap-4 mt-6">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-full border border-gray hover:bg-gray-50"
+            className="px-6 py-2 rounded-full border border-lightgray hover:bg-lightgray-50"
           >
             Cancel
           </button>
@@ -176,7 +177,7 @@ const EWallet = () => {
 
   const handleSuccessClose = () => {
     setIsSuccess(false);
-    window.location.href = "/wallet-info"; // Replace with your actual route
+    window.location.href = "/"; // Replace with your actual route
   };
 
   return (
@@ -199,112 +200,13 @@ const EWallet = () => {
       />
       <div className="flex">
         {/* Left Sidebar */}
-        <aside className="w-1/4 p-8 flex flex-col items-center border-r border-gray mt-10">
-          <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border">
-            <img
-              src="/api/placeholder/80/80"
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <h2 className="text-xl font-semibold mb-8">John Doe</h2>
-
-          <nav className="w-full space-y-6">
-            <a
-              href="#"
-              className="flex items-center gap-3 transition-colors duration-200 hover:text-primary"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-current"
-              >
-                <path
-                  d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>Edit Profile</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 transition-colors duration-200 hover:text-primary"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-current"
-              >
-                <path
-                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 6V12L16 14"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>Booking History</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 text-primary transition-colors duration-200 hover:text-primary"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-current"
-              >
-                <path
-                  d="M21 4H3C1.89543 4 1 4.89543 1 6V18C1 19.1046 1.89543 20 3 20H21C22.1046 20 23 19.1046 23 18V6C23 4.89543 22.1046 4 21 4Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M1 10H23"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>E-Wallet</span>
-            </a>
-          </nav>
-        </aside>
+        <LeftNav/>
 
         {/* Main Content */}
         <main className="w-3/4 p-8 mt-10">
           <div className="flex justify-between items-start">
             <div className="w-3/5">
-              <h1 className="text-primary heading2 mb-6 border-b border-gray pb-3">
+              <h1 className="text-primary heading2 mb-6 border-b border-lightgray pb-3">
                 Top Up to your wallet
               </h1>
               <div className="space-y-8">
@@ -359,10 +261,10 @@ const EWallet = () => {
                   1500 Baht
                 </p>
                 <div className="space-y-2">
-                  <button className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 hover:text-primary">
+                  <button className="w-full text-left py-3 px-4 rounded-xl border border-lightgray transition-colors duration-200 hover:text-primary">
                     History Transactions
                   </button>
-                  <button className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 hover:text-primary">
+                  <button className="w-full text-left py-3 px-4 rounded-xl border border-lightgray transition-colors duration-200 hover:text-primary">
                     E-Coupon
                   </button>
                 </div>

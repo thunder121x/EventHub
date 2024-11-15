@@ -10,7 +10,7 @@ const Sign_up = () => {
   return (
     <div className="">
       {/* Left Section */}
-      <div className="w-1/2 px-14 bg-white max-h-screen pt-14 testss rounded-tr-[30px] rounded-br-[30px]">
+      <div className="w-1/2 px-14 bg-white max-h-screen pt-6 testss rounded-tr-[30px] rounded-br-[30px] -space-y-8">
         {/* Logo Header */}
         <HashLink
           smooth

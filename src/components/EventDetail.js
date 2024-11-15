@@ -4,18 +4,21 @@ import EventInfoCard from "./EventInfoCard";
 import StarRating from "./StarRating";
 // import instructorImage from "../assets/instructor.png"; // replace with actual instructor image
 import classImage from "../assets/classImage.png"; // replace with actual class image
-import arrowBack from "../assets/arrow_back.png"; // replace with actual class image
+import arrowBack from "../assets/arrow_back.svg"; // replace with actual class image
 import like from "../assets/heart.png"; // replace with actual class image
 import share from "../assets/share.png"; // replace with actual class image
 import Profile from "../assets/Profile.jpg";
 import WorkshopRecommendationBox from "./WorkshopRecomendationBox";
 import Footer from "./Footer";
+import BackButton from "./function";
 
 const EventDetail = () => {
   return (
     <div className="bg-background min-h-screen pt-36">
       <div className="flex gap-4">
-        <img src={arrowBack} alt="arrowBack" className="w-42 h-8 mr-2 pl-24" />
+        <div className=" mr-2 pl-24">
+          <BackButton />
+        </div>
         <div className="flex-grow">
           <div className="flex">
             <p className="text-primary paragraph1 mb-2">Cooking</p>

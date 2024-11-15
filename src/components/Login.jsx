@@ -5,8 +5,17 @@ import Profile from "../assets/Profile.jpg";
 import { HashLink } from "react-router-hash-link";
 import Navbar from "./Navbar.js";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    navigate(`/Profile#top`, {
+      state: {
+      },
+    });
+  };
   return (
     <div>
     <Navbar isScrolled={false} onShowing={true}/>
@@ -19,7 +28,7 @@ const Login = () => {
       }}
       className="min-h-screen flex items-center justify-center p-4 restrictedFeature"
     >
-      <div className="max-w-lg max-h-fit w-full space-y-6 bg-white p-8 rounded-lg shadow-lg overlayForm">
+      <div className="max-w-lg max-h-fit w-full space-y-2 bg-white p-8 rounded-lg shadow-lg overlayForm">
         <HashLink
           smooth
           to="/#top"
@@ -45,7 +54,7 @@ const Login = () => {
         <h2 className="mt-6  text-center heading1">Log in</h2>
 
         {/* Form */}
-        <form className="mt-8 space-y-6 mx-10">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6 mx-10">
           <div className="space-y-4 rounded-lg">
             <div>
               <input

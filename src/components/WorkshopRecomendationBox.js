@@ -5,8 +5,8 @@ import { HashLink } from "react-router-hash-link";
 
 function WorkshopRecommendationBox() {
   return (
-    <HashLink smooth to="/EventDetail">
-      <div className="max-w-sm mx-auto bg-white rounded-3xl shadow-lg overflow-hidden workshopRecommendation mx-5 my-5">
+    <HashLink smooth to="/EventDetail#top">
+      <div className="max-w-sm mx-auto bg-white rounded-3xl shadow-lg overflow-hidden workshopRecommendation my-5">
         <div className="relative">
           <img
             src={mockImage} // Add your workshop image URL
