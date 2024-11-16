@@ -1,20 +1,75 @@
-import React from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
+import EventBox from "./EventBox";
 import headerImage from "../assets/header.png";
-import searchIcon from "../assets/emoji/searchIcon.png";
-import WorkshopRecommendationBox from "./WorkshopRecomendationBox";
 
 function FilterPageWithState() {
   const location = useLocation();
-  const { workshopType, province, startDate, endDate } = location.state || {};
+  const { eventType = "All Events", province } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
 
-  // Redirect back to the main search page if any of the required state data is missing
-  if (!workshopType || !province || !startDate || !endDate) {
-    return <Navigate to="/" />;
-  }
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        let q = collection(db, "event");
+
+        // สร้างเงื่อนไขการกรอง
+        const queries = [];
+        if (eventType !== "All Events") {
+          queries.push(where("eventTypeEN", "==", eventType));  // กรองตาม eventType
+        }
+        if (province) {
+          queries.push(where("provNameEN", "==", province));  // กรองตาม province
+        }
+
+        // ใช้ query หากมีเงื่อนไข
+        if (queries.length > 0) {
+          q = query(q, ...queries);
+        }
+
+        const querySnapshot = await getDocs(q);
+        const fetchedEvents = [];
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.bannerImage && data.eventNameEN && data.ampNameEN && data.provNameEN) {
+            fetchedEvents.push({
+              id: doc.id,
+              bannerImage: data.bannerImage,
+              eventNameEN: data.eventNameEN,
+              ampNameEN: data.ampNameEN,
+              provNameEN: data.provNameEN,
+            });
+          }
+        });
+
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [eventType, province]);  // ดึงข้อมูลใหม่เมื่อ eventType หรือ province เปลี่ยนแปลง
+
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   return (
     <div>
+      {/* Header Section */}
       <header
         className="bg-primary text-white text-center py-10"
         style={{
@@ -22,85 +77,75 @@ function FilterPageWithState() {
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "360px",
-          display: "flex", // Enable Flexbox
-          flexDirection: "column", // Stack items vertically
-          justifyContent: "center", // Center vertically
-          alignItems: "center", // Center horizontally
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <div>
-          <FilterPage
-            workshopType={workshopType}
-            province={province}
-            startDate={new Date(startDate)}
-            endDate={new Date(endDate)}
-          />
+        <div className="flex flex-col items-center">
+          <h1 className="display2 text-primary">Events Found</h1>
+          <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
+          <div className="flex items-center">
+            {province && <span className="heading4 px-4">{province}</span>}
+            {eventType !== "All Events" && (
+              <>
+                <span className="heading4 px-4">|</span>
+                <span className="heading4 px-4">{eventType}</span>
+              </>
+            )}
+            {eventType === "All Events" && (
+              <>
+                <span className="heading4 px-4">|</span>
+                <span className="heading4 px-4">All Events</span>
+              </>
+            )}
+          </div>
+          <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
+          <div className="flex items-center">
+            <span className="heading4 px-4">Search Date: {getCurrentDate()}</span>
+          </div>
         </div>
       </header>
 
+      {/* Event Count Section */}
       <div className="px-20 py-10">
-        {/* <div className="border-l-2 border-primary h-10 mx-2 rounded-l-md"></div>
-      <span className="text-heading-2 font-poppins">Workshop</span> */}
         <div className="flex-col">
-          <div className="flex justify-start">
-            <h1 className="display2 text-primary">9 Workshops Founds</h1>
+          <div className="flex justify-start mb-4">
+            <h1 className="display2 text-primary">
+              {loading
+                ? "Loading Workshops..."
+                : `${events.length} Workshop${events.length !== 1 ? "s" : ""} Found`}
+            </h1>
           </div>
-          <div className="bg-gray opacity-20 w-full h-0.5 my-4 mr-2"></div>
+          <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FilterPage({ workshopType, province, startDate, endDate }) {
-  return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="flex items-center bg-white py-1 px-4 rounded-[21px] shadow-lg max-w text-black">
-        {/* Province */}
-        <div className="flex items-center px-4">
-          <span className="heading4">{province}</span>
-        </div>
-
-        {/* Divider */}
-        <div className="border-l-2 h-8 mx-4" />
-
-        {/* Date Range */}
-        <div className="flex items-center px-4">
-          <span className="heading4">
-            {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
-          </span>
-        </div>
-
-        {/* Divider */}
-        <div className="border-l-2 h-8 mx-4" />
-
-        {/* Workshop Type */}
-        <div className="flex items-center px-4">
-          <span className="heading4">{workshopType}</span>
-        </div>
-
-        {/* Search Icon */}
-        <div className="ml-4">
-          <button className="bg-purple-500 p-2 rounded-full">
-            <img
-              src={searchIcon}
-              alt="SearchIcon"
-              className="w-6 h-6 text-white"
-            />
-          </button>
-        </div>
+        {/* Event Grid Section */}
+        {loading ? (
+          <p className="text-center heading4">Loading...</p>
+        ) : events.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4 mt-8">
+            {events.map((event) => (
+              <EventBox
+                key={event.id}
+                image={event.bannerImage}
+                title={event.eventNameEN}
+                location={`${event.ampNameEN}, ${event.provNameEN}`}
+                id={event.id}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-center heading4">
+              No events found matching your search criteria.
+            </p>
+            <p className="text-center heading5">
+              Please adjust your search filters or try viewing all events.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
