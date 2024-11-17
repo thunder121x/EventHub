@@ -18,9 +18,9 @@ function Navbar({ isScrolled, onShowing }) {
           "/Profile-BookingHistory",
           "/Profile-E-Wallet",
         ].includes(location.pathname)
-          ? isScrolled
-            ? "bg-white text-primary shadow-md"
-            : "bg-primary text-white shadow-md"
+          ? "bg-primary text-white shadow-md"
+          : isScrolled
+          ? "bg-white text-primary shadow-md"
           : "text-white text-shadow"
       } p-4 fixed top-0 left-0 w-full 
        ${location.pathname === "/Login" ? "z-[1]" : "z-10"} 
