@@ -4,10 +4,16 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import EventBox from "./EventBox";
 import headerImage from "../assets/header.png";
+import searchIcon from "../assets/emoji/searchIcon.png";
 
 function FilterPageWithState() {
   const location = useLocation();
-  const { workshopType = "All Events", province } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
+  const {
+    workshopType = "All Events",
+    province,
+    startDate,
+    endDate,
+  } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,34 +84,19 @@ function FilterPageWithState() {
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "360px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          display: "flex", // Enable Flexbox
+          flexDirection: "column", // Stack items vertically
+          justifyContent: "center", // Center vertically
+          alignItems: "center", // Center horizontally
         }}
       >
-        <div className="flex flex-col items-center">
-          <h1 className="display2 text-primary">Events Found</h1>
-          <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
-          <div className="flex items-center">
-            {province && <span className="heading4 px-4">{province}</span>}
-            {workshopType !== "All Events" && (
-              <>
-                <span className="heading4 px-4">|</span>
-                <span className="heading4 px-4">{workshopType}</span>
-              </>
-            )}
-            {workshopType === "All Events" && (
-              <>
-                <span className="heading4 px-4">|</span>
-                <span className="heading4 px-4">All Events</span>
-              </>
-            )}
-          </div>
-          <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
-          <div className="flex items-center">
-            <span className="heading4 px-4">Search Date: {getCurrentDate()}</span>
-          </div>
+        <div>
+          <FilterPage
+            workshopType={workshopType}
+            province={province}
+            startDate={new Date(startDate)}
+            endDate={new Date(endDate)}
+          />
         </div>
       </header>
 
@@ -116,7 +107,9 @@ function FilterPageWithState() {
             <h1 className="display2 text-primary">
               {loading
                 ? "Loading Workshops..."
-                : `${events.length} Workshop${events.length !== 1 ? "s" : ""} Found`}
+                : `${events.length} Workshop${
+                    events.length !== 1 ? "s" : ""
+                  } Found`}
             </h1>
           </div>
           <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
@@ -147,6 +140,48 @@ function FilterPageWithState() {
             </p>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function FilterPage({ workshopType, province, startDate, endDate }) {
+  return (
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="flex items-center bg-white py-1 px-4 rounded-[21px] shadow-lg max-w text-black">
+        {/* Province */}
+        <div className="flex items-center px-4">
+          <span className="heading4">{province}</span>
+        </div>
+
+        {/* Divider */}
+        <div className="border-l-2 h-8 mx-4" />
+
+        {/* Date Range */}
+        <div className="flex items-center px-4">
+          <span className="heading4">
+            {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div className="border-l-2 h-8 mx-4" />
+
+        {/* Workshop Type */}
+        <div className="flex items-center px-4">
+          <span className="heading4">{workshopType}</span>
+        </div>
+
+        {/* Search Icon */}
+        <div className="ml-4">
+          <button className="bg-purple-500 p-2 rounded-full">
+            <img
+              src={searchIcon}
+              alt="SearchIcon"
+              className="w-6 h-6 text-white"
+            />
+          </button>
+        </div>
       </div>
     </div>
   );
