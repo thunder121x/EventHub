@@ -7,7 +7,7 @@ import headerImage from "../assets/header.png";
 
 function FilterPageWithState() {
   const location = useLocation();
-  const { eventType = "All Events", province } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
+  const { workshopType = "All Events", province } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,8 +20,9 @@ function FilterPageWithState() {
 
         // สร้างเงื่อนไขการกรอง
         const queries = [];
-        if (eventType !== "All Events") {
-          queries.push(where("eventTypeEN", "==", eventType));  // กรองตาม eventType
+        if (workshopType !== "All Events") {
+          console.log(workshopType);
+          queries.push(where("eventTypeEN", "==", workshopType)); // กรองตาม workshopType
         }
         if (province) {
           queries.push(where("provNameEN", "==", province));  // กรองตาม province
@@ -57,7 +58,7 @@ function FilterPageWithState() {
     };
 
     fetchEvents();
-  }, [eventType, province]);  // ดึงข้อมูลใหม่เมื่อ eventType หรือ province เปลี่ยนแปลง
+  }, [workshopType, province]);  // ดึงข้อมูลใหม่เมื่อ workshopType หรือ province เปลี่ยนแปลง
 
   const getCurrentDate = () => {
     const currentDate = new Date();
@@ -88,13 +89,13 @@ function FilterPageWithState() {
           <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
           <div className="flex items-center">
             {province && <span className="heading4 px-4">{province}</span>}
-            {eventType !== "All Events" && (
+            {workshopType !== "All Events" && (
               <>
                 <span className="heading4 px-4">|</span>
-                <span className="heading4 px-4">{eventType}</span>
+                <span className="heading4 px-4">{workshopType}</span>
               </>
             )}
-            {eventType === "All Events" && (
+            {workshopType === "All Events" && (
               <>
                 <span className="heading4 px-4">|</span>
                 <span className="heading4 px-4">All Events</span>
