@@ -1,15 +1,14 @@
 import "../styles.css";
 import React from "react";
-import { HashLink } from "react-router-hash-link";
+import { Link } from "react-router-dom"; // เปลี่ยนมาใช้ Link แทน HashLink
 
 function EventBox({ image, title, location, id }) {
-  // ตรวจสอบว่ามีข้อมูลหรือไม่ก่อนแสดงผล
   if (!image || !title || !location || !id) {
     return null; // ถ้าไม่มีข้อมูลที่จำเป็นให้ไม่แสดงอะไร
   }
 
   return (
-    <HashLink smooth to={`/EventDetail#top`}>
+    <Link to={`/EventDetail/${id}`}> {/* ใช้ Link แทน HashLink */}
       <div className="max-w-sm mx-auto bg-white rounded-3xl shadow-lg overflow-hidden workshopRecommendation my-5">
         <div className="relative">
           <img
@@ -25,17 +24,16 @@ function EventBox({ image, title, location, id }) {
           <p className="text-primary heading4 text-start">{location}</p>
           <h3 className="heading3 text-start">{title}</h3>
           <div className="mt-4">
-            <HashLink
-              smooth
-              to={`/event/${id}#top`} // เปลี่ยนไปใช้ HashLink แทน Link
+            <Link
+              to={`/EventDetail/${id}`} // เปลี่ยนไปใช้ Link
               className="text-secondary underline hover:text-primary"
             >
               View Details
-            </HashLink>
+            </Link>
           </div>
         </div>
       </div>
-    </HashLink>
+    </Link>
   );
 }
 

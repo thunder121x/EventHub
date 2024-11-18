@@ -22,7 +22,7 @@ function FilterPageWithState() {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        let q = collection(db, "event");
+        let eventQuery = collection(db, "event");
 
         // สร้างเงื่อนไขการกรอง
         const queries = [];
@@ -31,31 +31,31 @@ function FilterPageWithState() {
           queries.push(where("eventTypeEN", "==", workshopType)); // กรองตาม workshopType
         }
         if (province) {
-          queries.push(where("provNameEN", "==", province));  // กรองตาม province
+          filters.push(where("provNameEN", "==", province));
         }
 
-        // ใช้ query หากมีเงื่อนไข
-        if (queries.length > 0) {
-          q = query(q, ...queries);
+        if (filters.length > 0) {
+          eventQuery = query(eventQuery, ...filters);
+          console.log("eventQuery: ", eventQuery)
         }
 
-        const querySnapshot = await getDocs(q);
-        const fetchedEvents = [];
+        const querySnapshot = await getDocs(eventQuery);
+        const fetchedEvents = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.bannerImage && data.eventNameEN && data.ampNameEN && data.provNameEN) {
-            fetchedEvents.push({
-              id: doc.id,
-              bannerImage: data.bannerImage,
-              eventNameEN: data.eventNameEN,
-              ampNameEN: data.ampNameEN,
-              provNameEN: data.provNameEN,
-            });
-          }
-        });
+        console.log(events)
 
-        setEvents(fetchedEvents);
+        setEvents(
+          fetchedEvents.filter(
+            (event) =>
+              event.bannerImage &&
+              event.eventNameEN &&
+              event.ampNameEN &&
+              event.provNameEN
+          )
+        );
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
