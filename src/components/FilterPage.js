@@ -1,20 +1,82 @@
-import React from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
+import EventBox from "./EventBox";
 import headerImage from "../assets/header.png";
 import searchIcon from "../assets/emoji/searchIcon.png";
-import WorkshopRecommendationBox from "./WorkshopRecomendationBox";
 
 function FilterPageWithState() {
   const location = useLocation();
-  const { workshopType, province, startDate, endDate } = location.state || {};
+  const {
+    workshopType = "All Events",
+    province,
+    startDate,
+    endDate,
+  } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
 
-  // Redirect back to the main search page if any of the required state data is missing
-  if (!workshopType || !province || !startDate || !endDate) {
-    return <Navigate to="/" />;
-  }
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        let eventQuery = collection(db, "event");
+
+        // สร้างเงื่อนไขการกรอง
+        const queries = [];
+        if (workshopType !== "All Events") {
+          console.log(workshopType);
+          queries.push(where("eventTypeEN", "==", workshopType)); // กรองตาม workshopType
+        }
+        if (province) {
+          filters.push(where("provNameEN", "==", province));
+        }
+
+        if (filters.length > 0) {
+          eventQuery = query(eventQuery, ...filters);
+          console.log("eventQuery: ", eventQuery)
+        }
+
+        const querySnapshot = await getDocs(eventQuery);
+        const fetchedEvents = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        console.log(events)
+
+        setEvents(
+          fetchedEvents.filter(
+            (event) =>
+              event.bannerImage &&
+              event.eventNameEN &&
+              event.ampNameEN &&
+              event.provNameEN
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [workshopType, province]);  // ดึงข้อมูลใหม่เมื่อ workshopType หรือ province เปลี่ยนแปลง
+
+  const getCurrentDate = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   return (
     <div>
+      {/* Header Section */}
       <header
         className="bg-primary text-white text-center py-10"
         style={{
@@ -38,27 +100,46 @@ function FilterPageWithState() {
         </div>
       </header>
 
+      {/* Event Count Section */}
       <div className="px-20 py-10">
-        {/* <div className="border-l-2 border-primary h-10 mx-2 rounded-l-md"></div>
-      <span className="text-heading-2 font-poppins">Workshop</span> */}
         <div className="flex-col">
-          <div className="flex justify-start">
-            <h1 className="display2 text-primary">9 Workshops Founds</h1>
+          <div className="flex justify-start mb-4">
+            <h1 className="display2 text-primary">
+              {loading
+                ? "Loading Workshops..."
+                : `${events.length} Workshop${
+                    events.length !== 1 ? "s" : ""
+                  } Found`}
+            </h1>
           </div>
-          <div className="bg-gray opacity-20 w-full h-0.5 my-4 mr-2"></div>
+          <div className="bg-gray opacity-20 w-full h-0.5 my-4"></div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-          <WorkshopRecommendationBox />
-        </div>
+        {/* Event Grid Section */}
+        {loading ? (
+          <p className="text-center heading4">Loading...</p>
+        ) : events.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4 mt-8">
+            {events.map((event) => (
+              <EventBox
+                key={event.id}
+                image={event.bannerImage}
+                title={event.eventNameEN}
+                location={`${event.ampNameEN}, ${event.provNameEN}`}
+                id={event.id}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-center heading4">
+              No events found matching your search criteria.
+            </p>
+            <p className="text-center heading5">
+              Please adjust your search filters or try viewing all events.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

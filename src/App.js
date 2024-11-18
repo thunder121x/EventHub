@@ -68,7 +68,7 @@ function App() {
         <Route path="/Profile-EditProfile" element={<EditProfile />} />
         <Route path="/Profile-BookingHistory" element={<BookingHistory />} />
         <Route path="/Profile-E-Wallet" element={<EWallet />} />
-        <Route path="/EventDetail" element={<EventDetail />} />
+        <Route path="/EventDetail/:id" element={<EventDetail />} />
       </Routes>
       {/* <Footer /> */}
     </div>

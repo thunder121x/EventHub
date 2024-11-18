@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DateRangePicker } from "react-date-range";
-import dropdownIcon from "../assets/emoji/dropdown.png"; // Ensure correct path
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase"; // Import Firebase config
+import dropdownIcon from "../assets/emoji/dropdown.png";
 import calendarIcon from "../assets/emoji/calendar.png";
-import "react-date-range/dist/styles.css"; // Main CSS
-import "react-date-range/dist/theme/default.css"; // Theme CSS
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 function SearchForm() {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ function SearchForm() {
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [provinceFilter, setProvinceFilter] = useState("");
+  const [provinces, setProvinces] = useState([]); // Provinces from Firestore
+  const [eventTypes, setEventTypes] = useState([]); // Event Types from Firestore
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -23,34 +27,7 @@ function SearchForm() {
   ]);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
 
-  // Validation state
   const [errors, setErrors] = useState({});
-
-  const workshopOptions = [
-    "Creative",
-    "Study Nature",
-    "Way of life",
-    "History",
-    "Culture",
-    "Agriculture",
-    "Ecology",
-    "Adventure",
-    "Health",
-  ];
-
-  const provinces = [
-    "Bangkok",
-    "Ang Thong",
-    "Ayutthaya",
-    "Chainat",
-    "Chachoengsao",
-    "Chanthaburi",
-    "Chiang Mai",
-    "Chiang Rai",
-    "Chon Buri",
-    "Chumphon",
-    // ... add remaining provinces
-  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -87,26 +64,46 @@ function SearchForm() {
     setShowDateRangePicker(false);
   };
 
-  // Close dropdowns or date picker when clicking outside
   const dropdownRef = useRef(null);
   const datePickerRef = useRef(null);
 
-const handleClickOutside = (e) => {
-  // Check if refs are null before accessing contains
-  if (
-    (dropdownRef.current && dropdownRef.current.contains(e.target)) ||
-    (datePickerRef.current && datePickerRef.current.contains(e.target))
-  ) {
-    return; // Do nothing if click is inside dropdown or date picker
-  }
+  const handleClickOutside = (e) => {
+    if (
+      (dropdownRef.current && dropdownRef.current.contains(e.target)) ||
+      (datePickerRef.current && datePickerRef.current.contains(e.target))
+    ) {
+      return;
+    }
 
-  setShowWorkshopDropdown(false);
-  setShowProvinceDropdown(false);
-  setShowDateRangePicker(false);
-};
+    setShowWorkshopDropdown(false);
+    setShowProvinceDropdown(false);
+    setShowDateRangePicker(false);
+  };
 
+  // Fetch data from Firestore
   useEffect(() => {
+    const fetchEventData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "event"));
+        const provincesSet = new Set();
+        const eventTypesSet = new Set();
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.provNameEN) provincesSet.add(data.provNameEN);
+          if (data.eventTypeEN) eventTypesSet.add(data.eventTypeEN);
+        });
+
+        setProvinces(Array.from(provincesSet)); // Remove duplicates
+        setEventTypes(Array.from(eventTypesSet));
+      } catch (error) {
+        console.error("Error fetching event data:", error);
+      }
+    };
+
+    fetchEventData();
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -147,7 +144,7 @@ const handleClickOutside = (e) => {
                     ref={dropdownRef}
                     className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 w-80"
                   >
-                    {workshopOptions.map((type) => (
+                    {eventTypes.map((type) => (
                       <div
                         key={type}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
@@ -162,6 +159,8 @@ const handleClickOutside = (e) => {
                   </div>
                 )}
               </div>
+
+              {/* Province Dropdown */}
               <div className="input-field grid grid-flow-col relative mt-4">
                 <div className="flex flex-col">
                   <div className="relative w-80">
@@ -250,15 +249,17 @@ const handleClickOutside = (e) => {
                     <DateRangePicker
                       ranges={dateRange}
                       onChange={handleSelectDateRange}
-                      rangeColors={["#4C51BF"]}
+                      rangeColors={["#3EB489"]}
+                      className="shadow-lg"
                     />
                   </div>
                 )}
               </div>
 
+              {/* Submit Button with new style */}
               <button
                 type="submit"
-                className="search-button mt-5 w-full bg-primary text-white py-2 rounded"
+                className="bg-purple-600 text-white font-semibold py-2 px-6 rounded-full hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 transition mt-4 w-full"
               >
                 Search
               </button>
