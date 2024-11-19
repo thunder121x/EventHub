@@ -13,7 +13,7 @@ import Sign_up from "./components/Sign_up";
 import ReservationConfirmation from "./components/ReservationConfirmation";
 import EditProfile from "./components/Edit_profile";
 import BookingHistory from "./components/Bookinghistory";
-
+//test
 function App() {
   const [navbarBg, setNavbarBg] = useState(false);
   const [navbarShowOff, setNavbarShowOff] = useState(false);
