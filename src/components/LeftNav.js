@@ -1,109 +1,109 @@
-import React from "react";
 import "../styles.css";
-import profile from "../assets/Profile.jpg";
+import React, { useState, useEffect } from "react";
+import logo from "../assets/logo.png";
+import { HashLink } from "react-router-hash-link";
+import { useLocation } from "react-router-dom";
+import { auth, db } from "../firebase"; // Make sure you import firebase setup
+import { doc, getDoc } from "firebase/firestore";
 
-const LeftNav = () => {
+function Navbar({ isScrolled, onShowing }) {
+  const location = useLocation();
+  const [user, setUser] = useState(null); // State to store user info
+
+  useEffect(() => {
+    // Listen for authentication state changes
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Fetch user data from Firestore
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          setUser(userDoc.data());
+        } else {
+          console.log("User not found in Firestore");
+        }
+      } else {
+        setUser(null); // Set to null if no user is logged in
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup on component unmount
+  }, []);
+
+  if (!onShowing) {
+    return <div></div>;
+  }
+
   return (
-    <aside className="w-1/4 p-8 flex flex-col items-center border-r border-lightgray mt-10">
-      <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border">
-        <img
-          src={profile}
-          alt="Profile"
-          className="w-full h-full object-cover"
-        />
+    <nav
+      className={`${
+        [
+          "/Profile",
+          "/Profile-EditProfile",
+          "/Profile-BookingHistory",
+          "/Profile-E-Wallet",
+        ].includes(location.pathname)
+          ? "bg-primary text-white shadow-md"
+          : isScrolled
+          ? "bg-white text-primary shadow-md"
+          : "text-white text-shadow"
+      } p-4 fixed top-0 left-0 w-full 
+       ${location.pathname === "/Login" ? "z-[1]" : "z-10"} 
+        transition-colors duration-300 navtext`}
+    >
+      <div className="container mx-auto flex justify-between items-center">
+        <HashLink
+          smooth
+          to="/#top"
+          className="flex items-center text-display-1 font-headline"
+        >
+          <img src={logo} alt="Logo" className="w-8 h-8 mr-2" />
+          EventHub
+        </HashLink>
+        <ul className="flex space-x-8">
+          <li>
+            <HashLink smooth to="/#SearchBar" className="hover:text-secondary">
+              Search Bar
+            </HashLink>
+          </li>
+          <li>
+            <HashLink
+              smooth
+              to="/#ExploreWorkshops"
+              className="hover:text-secondary"
+            >
+              Explore Workshops
+            </HashLink>
+          </li>
+          <li>
+            <HashLink smooth to="/AboutUs#top" className="hover:text-secondary">
+              About Us
+            </HashLink>
+          </li>
+          <li>
+            {/* Conditionally render the Login button or user image */}
+            {user ? (
+              <HashLink
+                smooth
+                to="/Profile"
+                className="flex items-center gap-2 hover:text-secondary"
+              >
+                <img
+                  src={user.imageUrl}
+                  alt="User"
+                  className="w-8 h-8 rounded-full"
+                />
+              </HashLink>
+            ) : (
+              <HashLink smooth to="/Login" className="hover:text-secondary">
+                Login
+              </HashLink>
+            )}
+          </li>
+        </ul>
       </div>
-      <h2 className="text-xl font-semibold mb-8">John Doe</h2>
-
-      <nav className="w-full space-y-6">
-        <a
-          href="/Profile-EditProfile"
-          className="flex items-center gap-3  text-primary transition-colors duration-200 hover:text-primary"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-current"
-          >
-            <path
-              d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Edit Profile</span>
-        </a>
-        <a
-          href="/Profile-BookingHistory"
-          className="flex items-center gap-3 transition-colors duration-200 hover:text-primary"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-current"
-          >
-            <path
-              d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M12 6V12L16 14"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Booking History</span>
-        </a>
-        <a
-          href="/Profile-E-Wallet"
-          className="flex items-center gap-3  transition-colors duration-200 hover:text-primary"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-current"
-          >
-            <path
-              d="M21 4H3C1.89543 4 1 4.89543 1 6V18C1 19.1046 1.89543 20 3 20H21C22.1046 20 23 19.1046 23 18V6C23 4.89543 22.1046 4 21 4Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M1 10H23"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>E-Wallet</span>
-        </a>
-      </nav>
-    </aside>
+    </nav>
   );
-};
-export default LeftNav;
+}
+
+export default Navbar;
