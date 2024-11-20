@@ -129,28 +129,15 @@ const EventDetail = () => {
             </ul>
           </div>
 
-          {/* Instructor Section */}
+          {/* Cotact */}
           <div className="text-lightblack paragraph2 pb-10">
-            <h2 className="heading2 mb-2">Instructor</h2>
-            <div className="flex items-center justify-start gap-20">
-              <div className="w-[69px] h-[69px] overflow-hidden rounded-full">
-                <img
-                  src={event.instructorImage || "/default-profile.png"}
-                  alt="Instructor"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            <h2 className="heading2 mb-2">Contact</h2>
               <div>
-                <p className="search text-lightblack">{event.instructorName || "John Doe"}</p>
-                <p className="text-[15px] text-base leading-none text-lightblack">
-                  {event.instructorRole || "Instructor"}
-                </p>
-                <p className="text-[15px] text-base leading-none text-lightblack">
-                  Contact: {event.eventTel || "Not Provided"}
+                <p className="text-[16px] text-base leading-none text-lightblack ">
+                  {event.eventTel || "Not Provided"}
                 </p>
               </div>
             </div>
-          </div>
         </div>
 
         {/* Sidebar */}
