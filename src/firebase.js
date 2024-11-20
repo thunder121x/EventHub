@@ -20,5 +20,6 @@ const analytics = getAnalytics(app);
 
 // Initialize Firestore
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 export { db };
