@@ -1,25 +1,91 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../styles.css";
 import Approved from "../assets/Approved.png";
 import logo from "../assets/eventhub_logo.png";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase"; // Firestore configuration
+import { useLocation } from "react-router-dom";
 
 const ReservationConfirmation = () => {
+  const location = useLocation();
+  const ticketId = location.state?.ticketId || null; // รับ ticketId จากหน้าก่อน
+  const [ticketData, setTicketData] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTicketData = async () => {
+      if (!ticketId) return;
+      try {
+        const ticketDoc = await getDoc(doc(db, "tickets", ticketId));
+        if (ticketDoc.exists()) {
+          const ticket = ticketDoc.data();
+          setTicketData(ticket);
+
+          // ดึงข้อมูลผู้ใช้จาก user_id
+          if (ticket.user_id) {
+            const userDoc = await getDoc(doc(db, "users", ticket.user_id));
+            if (userDoc.exists()) {
+              setUserData(userDoc.data());
+            } else {
+              console.error("No user data found for this ticket!");
+            }
+          }
+        } else {
+          console.error("No ticket found with the provided ID!");
+        }
+      } catch (error) {
+        console.error("Error fetching ticket data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTicketData();
+  }, [ticketId]);
+
+  if (loading) {
+    return <p className="text-center text-gray-500 mt-10">Loading...</p>;
+  }
+
+  if (!ticketData || !userData) {
+    return <p className="text-center text-gray-500 mt-10">No data available.</p>;
+  }
+
+  const { eventName = "Unknown Event", start_date, quantity = 0 } = ticketData;
+  const { name = "Unknown", surname = "User" } = userData;
+
+  const formatDateTime = (timestamp) => {
+    if (!timestamp) return "Date not available";
+    const date = new Date(timestamp.toDate());
+    return `${date.toLocaleDateString()} - ${date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  };
+
   return (
     <div>
       {/* Navbar */}
       <div className="flex justify-between items-center mx-8 py-4">
         <div className="flex items-center">
-          <img src={logo} alt="EventHub logo" className="mr-4 w-10 h-10" />
+          {/* เพิ่มการคลิกโลโก้เพื่อกลับไปโฮมเพจ */}
+          <img
+            src={logo}
+            alt="EventHub logo"
+            className="mr-4 w-10 h-10 cursor-pointer"
+            onClick={() => (window.location.href = "/#top")}
+          />
           <button className="navtext text-primary">EventHub</button>
         </div>
         <div className="flex items-center">
-          <button className="heading3 mr-10">Balanced:</button>
-          <button className="heading3 ml-4">John Doe</button>
+          <button className="heading3 mr-10">Balance:</button>
+          <button className="heading3 ml-4">{`${name} ${surname}`}</button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-screen  p-4">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
         {/* Custom Success Checkmark */}
         <div className="mb-6">
           <div className="rounded-full p-3">
@@ -34,34 +100,29 @@ const ReservationConfirmation = () => {
 
         {/* Booking Message */}
         <div className="text-text mb-8">
-          We have sent your booking to the workshop provider.{" "}
-          <a href="#" className="text-blue-600 hover:text-blue-700 pb-5">
-          </a>
+          We have sent your booking to the workshop provider.
         </div>
 
         {/* Reservation Details */}
         <div className="w-full max-w flex pt-5">
           <div className="flex-1 text-center pr-3 border-r border-gray">
             <p className="text-primary font-medium mb-2">Workshop:</p>
-            <p className="text-text">Authentic Thai Cooking</p>
+            <p className="text-text">{eventName}</p>
           </div>
 
           <div className="flex-1 text-center pr-3 border-r border-gray">
             <p className="text-primary font-medium mb-2">Date & Time:</p>
-            <p className="text-text">
-              {new Date().toLocaleDateString()} -{" "}
-              {new Date().toLocaleTimeString()}
-            </p>
+            <p className="text-text">{formatDateTime(start_date)}</p>
           </div>
 
           <div className="flex-1 text-center pr-3 border-r border-gray">
             <p className="text-primary font-medium mb-2">Customer:</p>
-            <p className="text-text">John Doe</p>
+            <p className="text-text">{`${name} ${surname}`}</p>
           </div>
 
           <div className="flex-1 text-center">
             <p className="text-primary font-medium mb-2">Quantity:</p>
-            <p className="text-text">1 Ticket</p>
+            <p className="text-text">{quantity} Ticket{quantity > 1 ? "s" : ""}</p>
           </div>
         </div>
       </div>

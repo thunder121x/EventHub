@@ -13,7 +13,7 @@ function FilterPageWithState() {
     province,
     startDate,
     endDate,
-  } = location.state || {};  // ตรวจสอบว่าได้รับค่าหรือไม่
+  } = location.state || {};  
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,16 +27,16 @@ function FilterPageWithState() {
         // Define the filters array
         const filters = [];
 
-        // สร้างเงื่อนไขการกรอง
+       
         if (workshopType !== "All Events") {
-          filters.push(where("eventTypeEN", "==", workshopType)); // กรองตาม workshopType
+          filters.push(where("eventTypeEN", "==", workshopType)); 
         }
         if (province) {
-          filters.push(where("provNameEN", "==", province)); // กรองตาม province
+          filters.push(where("provNameEN", "==", province)); 
         }
 
         if (filters.length > 0) {
-          eventQuery = query(eventQuery, ...filters); // เปลี่ยนเป็น filters
+          eventQuery = query(eventQuery, ...filters); 
         }
 
         const querySnapshot = await getDocs(eventQuery);

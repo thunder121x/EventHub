@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMoneyBillAlt } from "react-icons/fa";
+import DatePicker from "react-datepicker"; 
+import "react-datepicker/dist/react-datepicker.css"; 
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMoneyBillAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import DatePicker from "react-datepicker"; // Import DatePicker
-import "react-datepicker/dist/react-datepicker.css"; // Import CSS for DatePicker
 
 const EventInfoCard = ({ id }) => {
   const [event, setEvent] = useState(null);
   const [numberOfBooking, setNumberOfBooking] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null); // To store the selected date
+  const [selectedDate, setSelectedDate] = useState(null); 
   const navigate = useNavigate();
 
   // Fetch data from Firestore using the id
@@ -29,16 +29,13 @@ const EventInfoCard = ({ id }) => {
     fetchEvent();
   }, [id]);
 
-  // Loading message
   if (!event) {
     return <p>Loading...</p>;
   }
 
-  // ฟังก์ชันจัดการเวลา
+  // คำนวณเวลา
   const formatEventTime = (eventTimePeriod) => {
     if (!eventTimePeriod) return "";
-
-    // กำหนดเวลาที่จะเริ่ม
     let startTime;
     if (eventTimePeriod < 30) {
       startTime = 540; // 9:00 AM
@@ -50,17 +47,37 @@ const EventInfoCard = ({ id }) => {
 
     const startHour = Math.floor(startTime / 60);
     const startMinute = startTime % 60;
-
-    const endHour = Math.floor((startTime + 90) / 60); // เพิ่ม 90 นาที
+    const endHour = Math.floor((startTime + 90) / 60); 
     const endMinute = (startTime + 90) % 60;
 
     const formatTime = (h, m) => `${h}:${m.toString().padStart(2, "0")}`;
     return `${formatTime(startHour, startMinute)} - ${formatTime(endHour, endMinute)}`;
   };
 
+  const totalAmount = numberOfBooking * (event.eventFee || 90); 
+  const remainingBalance = 200.01 - totalAmount;
+  const eventName = event.eventNameEN;
+  // ให้ eventFee และ bannerImage มาจาก event
+  const eventFee = event.eventFee || 90; // สมมติว่า eventFee มาจาก event
+  const bannerImage = event.bannerImage || ""; // สมมติว่า bannerImage มาจาก event
+
+  // ฟังก์ชันในการส่งข้อมูลไปยังหน้าจอง
+  const handleReserveClick = () => {
+    navigate(`/Reservation/${id}`, {
+      state: { 
+        numberOfBooking,
+        selectedDate,
+        eventFee,
+        bannerImage,
+        event,
+        eventName,
+        id,
+      }
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 w-[353px] h-fit">
-      {/* Date Picker */}
       <div className="flex items-center mb-4">
         <FaCalendarAlt className="w-[17px] h-[17px] text-lightblack mr-2" />
         <DatePicker
@@ -72,7 +89,6 @@ const EventInfoCard = ({ id }) => {
         />
       </div>
 
-      {/* Time */}
       <div className="flex items-center mb-4">
         <FaClock className="w-[17px] h-[17px] text-lightblack mr-2" />
         <p className="paragraph2 text-lightblack">
@@ -82,7 +98,6 @@ const EventInfoCard = ({ id }) => {
         </p>
       </div>
 
-      {/* Location */}
       <div className="flex items-center mb-2 gap-2">
         <FaMapMarkerAlt className="w-[17px] h-[17px] text-lightblack flex-shrink-0" />
         <p className="paragraph2 text-lightblack leading-tight">
@@ -97,7 +112,6 @@ const EventInfoCard = ({ id }) => {
         </p>
       </div>
 
-      {/* Fee */}
       <div className="flex items-center mb-4">
         <FaMoneyBillAlt className="w-[17px] h-[17px] text-lightblack mr-2" />
         <p className="paragraph2 text-lightblack">
@@ -105,7 +119,6 @@ const EventInfoCard = ({ id }) => {
         </p>
       </div>
 
-      {/* Booking Controls */}
       <div className="flex items-center justify-between mt-6 mb-4 pl-6">
         <button
           className="rounded-full border-lightgray border heading3 text-lightgray w-10 h-10 flex items-center justify-center"
@@ -122,17 +135,15 @@ const EventInfoCard = ({ id }) => {
         </button>
       </div>
 
-      {/* Reserve Button */}
-      <button
-        className="bg-primary text-white py-3 w-full rounded-[30px] search"
-        onClick={() =>
-          navigate("/Reservation", {
-            state: { numberOfBooking, selectedDate },
-          })
-        }
-      >
-        Reserve
-      </button>
+      {/* ปุ่ม "Reserve" */}
+      <div className="mt-6">
+        <button
+          onClick={handleReserveClick} 
+          className="bg-primary text-white py-3 w-full rounded-[30px] search"
+        >
+          Reserve
+        </button>
+      </div>
     </div>
   );
 };

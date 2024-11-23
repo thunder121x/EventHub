@@ -8,12 +8,15 @@ import WorkshopRecommendationBox from "./WorkshopRecomendationBox";
 import Footer from "./Footer";
 import BackButton from "./function";
 import WorkShop3Box from "./WorkShop3Box";
+import { useLocation } from "react-router-dom";
 
 //commit
 const EventDetail = () => {
   const { id } = useParams(); // Receive event ID from URL
   const [event, setEvent] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const location = useLocation(); // ดึง state ที่ส่งมาจาก SearchForm
+  const { startDate, endDate } = location.state || {}; // รับ startDate, endDate
 
   useEffect(() => {
     // Fetch event data from Firestore

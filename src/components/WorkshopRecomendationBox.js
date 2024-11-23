@@ -31,7 +31,7 @@ function WorkshopRecommendationBox({ image, title, location, id }) {
               to={`/EventDetail/${id}`} // เปลี่ยนไปใช้ Link
               className="text-secondary underline hover:text-primary"
             >
-              View Details
+ 
             </Link>
           </div>
         </div>
