@@ -24,6 +24,7 @@ const BookingHistory = () => {
 
         // ใช้ onSnapshot สำหรับดึงข้อมูลแบบเรียลไทม์
         unsubscribe = onSnapshot(q, (querySnapshot) => {
+          console.log("Snapshot triggered!");
           if (querySnapshot.empty) {
             console.log("No documents found.");
             setTickets([]); // ล้าง State เมื่อไม่มีข้อมูล

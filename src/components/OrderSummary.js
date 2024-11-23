@@ -96,15 +96,15 @@ const OrderSummary = ({  }) => {
           </div>
           <div className="flex justify-between text-[13px] mb-2 border-b pb-3">
             <span>{numberOfBooking} x eTicket</span>
-            <span>${totalAmount.toFixed(2)}</span>
+            <span>฿{totalAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-lg font-bold mb-2">
             <span>Total</span>
-            <span>${totalAmount.toFixed(2)}</span>
+            <span>฿{totalAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-[13px] text-gray mb-2">
             <span>Remaining Balance</span>
-            <span>${remainingBalance.toFixed(2)}</span>
+            <span>฿{remainingBalance.toFixed(2)}</span>
           </div>
         </div>
       </div>
