@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase"; // Firebase configuration
-import { collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { auth } from "../firebase";
 import logo from "../assets/eventhub_logo.png";
 import LeftNav from "./LeftNav";
@@ -9,6 +9,20 @@ const BookingHistory = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ฟังก์ชันสำหรับตรวจสอบสถานะของตั๋ว
+  const getTicketStatus = (startDate) => {
+    const currentDate = new Date();
+    const ticketDate = new Date(startDate); // แปลงจาก string เป็น Date
+
+    // ถ้า start_date ยังไม่ถึงวันที่ปัจจุบัน จะแสดงว่า Upcoming
+    if (ticketDate > currentDate) {
+      return "Upcoming";
+    } else {
+      return "Previous"; // ถ้าไม่ใช่จะแสดงว่า Previous
+    }
+  };
+
+  // ฟังก์ชันดึงข้อมูลตั๋วจาก Firestore
   const fetchTickets = async (userId) => {
     try {
       const ticketsRef = collection(db, "tickets");
@@ -23,6 +37,15 @@ const BookingHistory = () => {
           id: doc.id,
           ...doc.data(),
         }));
+
+        // เรียงลำดับข้อมูลจากวันที่ใหม่ที่สุด (ล่าสุด) ไปเก่าที่สุด
+        ticketData.sort((a, b) => {
+          // แปลง start_date เป็น Date
+          const dateA = new Date(a.start_date);
+          const dateB = new Date(b.start_date);
+          return dateB - dateA;
+        });
+
         setTickets(ticketData);
       }
       setLoading(false);
@@ -33,7 +56,6 @@ const BookingHistory = () => {
   };
 
   useEffect(() => {
-    // ตรวจสอบว่ามีผู้ใช้ที่ล็อกอินอยู่หรือไม่
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         console.log(`Logged in as: ${user.uid}`);
@@ -47,14 +69,6 @@ const BookingHistory = () => {
 
     return () => unsubscribe(); // Cleanup listener
   }, []);
-
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`;
-  };
 
   if (loading) {
     return <p className="text-center mt-10 text-gray-500">Loading booking history...</p>;
@@ -115,15 +129,15 @@ const BookingHistory = () => {
                       </div>
                       <div>
                         <p className="text-primary mb-1">Date & Time:</p>
-                        <p className="text-gray">{formatDateTime(ticket.start_date)}</p>
+                        <p className="text-gray">{ticket.start_date}</p>
                       </div>
                       <div className="justify-self-end">
                         <span
                           className={`px-6 py-4 rounded-full ${
-                            new Date(ticket.start_date) > new Date() ? "bg-primary" : "bg-gray"
+                            getTicketStatus(ticket.start_date) === "Upcoming" ? "bg-primary" : "bg-gray"
                           } text-white`}
                         >
-                          {new Date(ticket.start_date) > new Date() ? "Upcoming" : "Previous"}
+                          {getTicketStatus(ticket.start_date)}
                         </span>
                       </div>
                     </div>

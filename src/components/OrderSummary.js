@@ -5,7 +5,7 @@ import { auth } from "../firebase"; // Firebase auth configuration
 import { useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const OrderSummary = ({  }) => {
+const OrderSummary = ({}) => {
   const location = useLocation();
   const numberOfBooking = location.state?.numberOfBooking || 1;
   const selectedDate = location.state?.selectedDate || null;
@@ -18,7 +18,7 @@ const OrderSummary = ({  }) => {
     email: "",
     name: "",
     surname: "",
-    phoneNum: "" ,
+    phoneNum: "",
     pocket_money: "",
   });
   const [loading, setLoading] = useState(true); // Loading state for user data
@@ -77,7 +77,11 @@ const OrderSummary = ({  }) => {
 
   const { eventFee = "", bannerImage = "", eventName = "", location: eventLocation } = eventData;
   const totalAmount = eventFee * numberOfBooking; // คำนวณราคาจาก eventFee และ numberOfBooking
-  const remainingBalance = userData.pocket_money - totalAmount; 
+  const remainingBalance = userData.pocket_money - totalAmount;
+
+  // เช็คว่า Remaining Balance ติดลบหรือไม่
+  const isBalanceInsufficient = remainingBalance < 0;
+
   return (
     <div className="w-1/3 pl-8 mt-20">
       <div className="bg-white rounded-lg shadow-md">
@@ -102,9 +106,21 @@ const OrderSummary = ({  }) => {
             <span>Total</span>
             <span>฿{totalAmount.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-[13px] text-gray mb-2">
-            <span>Remaining Balance</span>
-            <span>฿{remainingBalance.toFixed(2)}</span>
+          {/* แสดงข้อความ "Insufficient balance" แทน "Remaining Balance" ถ้า remainingBalance ติดลบ */}
+          <div className="flex justify-between text-[13px] mb-2">
+            {isBalanceInsufficient ? (
+              <span className="">
+                Insufficient balance
+              </span>
+            ) : (
+              <>
+                <span>Remaining Balance</span>
+                <span>฿{remainingBalance.toFixed(2)}</span>
+              </>
+            )}
+            {isBalanceInsufficient && (
+              <span className="ml-4 ">฿ {Math.abs(remainingBalance).toFixed(2)}</span>
+            )}
           </div>
         </div>
       </div>

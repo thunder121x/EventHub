@@ -96,7 +96,7 @@ const AttendeeForm = ({ numberOfBooking }) => {
         month: "long",
         year: "numeric",
       }); // e.g., "25 November 2024"
-      const formattedStartDate = `${eventTime} ${formattedDate}`; // Combine time and date
+      const formattedStartDate = `${eventTime}   ${formattedDate}`; // Combine time and date
   
       // Add ticket to the tickets collection
       const ticketRef = await addDoc(collection(db, "tickets"), {
@@ -157,7 +157,7 @@ const AttendeeForm = ({ numberOfBooking }) => {
                 <input
                   type="text"
                   className="w-full pl-4 py-2 pr-2 border border-lightgray rounded-lg"
-                  placeholder="John"
+                  placeholder=""
                   defaultValue={index === 0 ? userData.name : ""}
                   readOnly={index === 0}
                 />
@@ -167,7 +167,7 @@ const AttendeeForm = ({ numberOfBooking }) => {
                 <input
                   type="text"
                   className="w-full pl-4 py-2 pr-2 border border-lightgray rounded-lg"
-                  placeholder="Doe"
+                  placeholder=""
                   defaultValue={index === 0 ? userData.surname : ""}
                   readOnly={index === 0}
                 />
@@ -179,7 +179,7 @@ const AttendeeForm = ({ numberOfBooking }) => {
               <input
                 type="email"
                 className="w-full pl-4 py-2 pr-2 border border-lightgray rounded-lg"
-                placeholder="JohnDoe@gmail.com"
+                placeholder=""
                 defaultValue={index === 0 ? userData.email : ""}
                 readOnly={index === 0}
               />
@@ -190,7 +190,7 @@ const AttendeeForm = ({ numberOfBooking }) => {
               <input
                 type="text"
                 className="w-full pl-4 py-2 pr-2 border border-lightgray rounded-lg"
-                placeholder="+66 (555) 000-0000"
+                placeholder=""
                 defaultValue={index === 0 ? userData.phoneNum : ""}
                 readOnly={index === 0}
               />
