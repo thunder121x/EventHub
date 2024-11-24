@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase"; // Firebase configuration
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
 import { auth } from "../firebase";
 import logo from "../assets/eventhub_logo.png";
 import LeftNav from "./LeftNav";
@@ -9,63 +9,47 @@ const BookingHistory = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let unsubscribe;
-    const fetchTickets = async () => {
-      if (!auth.currentUser) {
-        console.error("No user is logged in");
-        setLoading(false);
-        return;
+  const fetchTickets = async (userId) => {
+    try {
+      const ticketsRef = collection(db, "tickets");
+      const q = query(ticketsRef, where("user_id", "==", userId));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log("No booking history found for this user.");
+        setTickets([]);
+      } else {
+        const ticketData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTickets(ticketData);
       }
-
-      try {
-        const ticketsRef = collection(db, "tickets");
-        const q = query(ticketsRef, where("user_id", "==", auth.currentUser.uid));
-
-        // ใช้ onSnapshot สำหรับดึงข้อมูลแบบเรียลไทม์
-        unsubscribe = onSnapshot(q, (querySnapshot) => {
-          console.log("Snapshot triggered!");
-          if (querySnapshot.empty) {
-            console.log("No documents found.");
-            setTickets([]); // ล้าง State เมื่อไม่มีข้อมูล
-          } else {
-            const ticketData = querySnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-
-            // เก็บข้อมูลลง localStorage เพื่อให้ไม่หายไปเมื่อรีเฟรช
-            localStorage.setItem("tickets", JSON.stringify(ticketData));
-            setTickets(ticketData);
-          }
-          setLoading(false);
-        });
-      } catch (error) {
-        console.error("Error fetching tickets:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchTickets();
-
-    // Cleanup subscription when component unmounts
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, []);
-
-  // โหลดข้อมูลจาก localStorage เมื่อคอมโพเนนต์โหลด
-  useEffect(() => {
-    const storedTickets = JSON.parse(localStorage.getItem("tickets"));
-    if (storedTickets) {
-      setTickets(storedTickets);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching tickets:", error);
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    // ตรวจสอบว่ามีผู้ใช้ที่ล็อกอินอยู่หรือไม่
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log(`Logged in as: ${user.uid}`);
+        fetchTickets(user.uid);
+      } else {
+        console.log("No user is logged in.");
+        setTickets([]);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup listener
   }, []);
 
   const formatDateTime = (dateString) => {
-    const date = new Date(dateString); // แปลงสตริงให้เป็น Date object
+    const date = new Date(dateString);
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -88,11 +72,9 @@ const BookingHistory = () => {
 
         <div className="flex">
           <LeftNav />
-
           <main className="w-3/4 p-8 mt-10">
             <h1 className="text-primary heading2 mb-6">Booking History</h1>
             <div className="border-b border-lightgray mb-8"></div>
-
             <p className="text-gray-500">You have no past bookings.</p>
           </main>
         </div>
@@ -107,18 +89,6 @@ const BookingHistory = () => {
           <img src={logo} alt="EventHub logo" className="mr-2 w-10 h-10" />
           <button className="navtext font-bold">EventHub</button>
         </div>
-        <nav className="flex items-center gap-8">
-          <a href="#" className="navtext">Search Bar</a>
-          <a href="#" className="navtext">Explore Workshops</a>
-          <a href="#" className="navtext">About Us</a>
-          <div className="w-8 h-8 rounded-full bg-whitex overflow-hidden">
-            <img
-              src="/api/placeholder/32/32"
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </nav>
       </div>
 
       <div className="flex">
@@ -148,14 +118,19 @@ const BookingHistory = () => {
                         <p className="text-gray">{formatDateTime(ticket.start_date)}</p>
                       </div>
                       <div className="justify-self-end">
-                        <span className={`px-6 py-4 rounded-full ${new Date(ticket.start_date) > new Date() ? 'bg-primary' : 'bg-gray'} text-white`}>
+                        <span
+                          className={`px-6 py-4 rounded-full ${
+                            new Date(ticket.start_date) > new Date() ? "bg-primary" : "bg-gray"
+                          } text-white`}
+                        >
                           {new Date(ticket.start_date) > new Date() ? "Upcoming" : "Previous"}
                         </span>
                       </div>
                     </div>
                     <div className="mt-4">
                       <p className="text-gray">
-                        <strong>Quantity: </strong>{ticket.quantity}
+                        <strong>Quantity: </strong>
+                        {ticket.quantity}
                       </p>
                     </div>
                   </div>

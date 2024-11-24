@@ -57,12 +57,36 @@ const ReservationConfirmation = () => {
 
   const formatDateTime = (timestamp) => {
     if (!timestamp) return "Date not available";
-    const date = new Date(timestamp.toDate());
-    return `${date.toLocaleDateString()} - ${date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })}`;
+    
+    // ตรวจสอบว่า timestamp เป็นสตริงหรือไม่
+    if (typeof timestamp === "string") {
+      return timestamp;  // ถ้าเป็นสตริงก็ให้คืนค่ากลับไปเลย
+    }
+    
+    const date = new Date(timestamp);  // หากไม่ใช่สตริง ให้แปลงเป็น Date object
+    
+    // หาก timestamp เป็นวันที่ที่ไม่ถูกต้อง
+    if (isNaN(date)) return "Invalid Date"; 
+  
+    const options = {
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true, // ใช้ AM/PM
+    };
+  
+    const formattedTime = date.toLocaleTimeString([], options); // แสดงเวลาในรูปแบบ AM/PM
+    
+    const formattedDate = date.toLocaleDateString('en-GB', {
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric'
+    });
+  
+    return `${formattedTime} ${formattedDate}`; // ไม่มีลูกน้ำ
   };
+  
+  
+  
 
   return (
     <div>

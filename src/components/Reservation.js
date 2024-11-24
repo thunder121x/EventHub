@@ -17,6 +17,7 @@ function Reservation() {
   const numberOfBooking = location.state?.numberOfBooking || 1;
   const selectedDate = location.state?.selectedDate || null;
   const { id } = location.state || {}; // รับ id จาก location.state
+  const eventTime = location.state?.eventTime || "";
   
   // State for event data
   const [eventData, setEventData] = useState({});
@@ -127,6 +128,7 @@ function Reservation() {
               bannerImage={bannerImage}
               eventName = {eventName}
               id={id}
+              eventTime={eventTime} 
             
             selectedDate={selectedDate}/>
           </div>

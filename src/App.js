@@ -15,24 +15,44 @@ import EditProfile from "./components/Edit_profile";
 import BookingHistory from "./components/Bookinghistory";
 import { onAuthStateChanged } from "firebase/auth"; // สำหรับติดตามสถานะผู้ใช้
 import { auth } from "./firebase"; // Path ของ Firebase configuration
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "./firebase";
 
 function App() {
   const [navbarBg, setNavbarBg] = useState(false);
   const [navbarShowOff, setNavbarShowOff] = useState(false);
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null); // เก็บสถานะผู้ใช้
+  const [userData, setUserData] = useState(null);
 
   // ฟังก์ชันสำหรับติดตามสถานะการล็อคอิน
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user); // อัปเดตสถานะผู้ใช้เมื่อพบว่าผู้ใช้ล็อคอิน
+  
+        try {
+          // ดึงข้อมูลผู้ใช้จาก collection "users"
+          const userRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userRef);
+  
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log("User data:", userData); // ใช้ข้อมูลตามต้องการ
+            setUserData(userData); // เก็บข้อมูลใน state (ถ้าจำเป็น)
+          } else {
+            console.log("No user data found in Firestore.");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       } else {
         setCurrentUser(null); // ตั้งค่าเป็น null เมื่อไม่มีผู้ใช้ล็อคอิน
+        setUserData(null); // ล้างข้อมูลผู้ใช้
       }
     });
-
-    return () => unsubscribe(); // ทำการ cleanup listener เมื่อ component ถูก unmount
+  
+    return () => unsubscribe(); // Cleanup listener
   }, []);
 
   // ฟังก์ชันจัดการ background ของ Navbar

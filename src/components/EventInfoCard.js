@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMoneyBillAlt } from "react-icons/fa";
-import DatePicker from "react-datepicker"; 
-import "react-datepicker/dist/react-datepicker.css"; 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 const EventInfoCard = ({ id }) => {
   const [event, setEvent] = useState(null);
   const [numberOfBooking, setNumberOfBooking] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(null); 
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDateError, setShowDateError] = useState(false);
+  const [blockedDates, setBlockedDates] = useState([]); // state สำหรับเก็บวันที่ปิด
   const navigate = useNavigate();
 
-  // Fetch data from Firestore using the id
+  // Fetch event data and blocked dates from Firestore
   useEffect(() => {
     const fetchEvent = async () => {
       if (!id) return;
@@ -20,7 +22,20 @@ const EventInfoCard = ({ id }) => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setEvent(docSnap.data());
+        const data = docSnap.data();
+        setEvent(data);
+
+        // ดึง stop_date_1 ถึง stop_date_10
+        const blockedDatesArray = [];
+        for (let i = 1; i <= 10; i++) {
+          const stopDate = data[`stop_date_${i}`];
+          if (stopDate) {
+            // แปลง stop_date (ค่าสตริง) เป็นวันในทุกๆ เดือน ปี
+            const [day] = stopDate.split(" "); // ค่าสตริงแบบ "01", "22" จะถูกแยกเอาแค่วัน
+            blockedDatesArray.push(day); // เก็บเฉพาะวันที่
+          }
+        }
+        setBlockedDates(blockedDatesArray);
       } else {
         console.error("No such document!");
       }
@@ -47,38 +62,43 @@ const EventInfoCard = ({ id }) => {
 
     const startHour = Math.floor(startTime / 60);
     const startMinute = startTime % 60;
-    const endHour = Math.floor((startTime + 90) / 60); 
+    const endHour = Math.floor((startTime + 90) / 60);
     const endMinute = (startTime + 90) % 60;
 
     const formatTime = (h, m) => `${h}:${m.toString().padStart(2, "0")}`;
     return `${formatTime(startHour, startMinute)} - ${formatTime(endHour, endMinute)}`;
   };
 
-  const totalAmount = numberOfBooking * (event.eventFee || 90); 
-  const remainingBalance = 200.01 - totalAmount;
-  const eventName = event.eventNameEN;
-  // ให้ eventFee และ bannerImage มาจาก event
-  const eventFee = event.eventFee || 90; // สมมติว่า eventFee มาจาก event
-  const bannerImage = event.bannerImage || ""; // สมมติว่า bannerImage มาจาก event
-
-  // ฟังก์ชันในการส่งข้อมูลไปยังหน้าจอง
   const handleReserveClick = () => {
+    if (!selectedDate) {
+      setShowDateError(true);
+      return;
+    }
+
+    setShowDateError(false);
     navigate(`/Reservation/${id}`, {
-      state: { 
+      state: {
         numberOfBooking,
         selectedDate,
-        eventFee,
-        bannerImage,
+        eventFee: event.eventFee || 90,
+        bannerImage: event.bannerImage || "",
         event,
-        eventName,
+        eventName: event.eventNameEN,
         id,
+        eventTime: formatEventTime(event.eventTimePeriod),
       }
     });
   };
 
+  // ฟังก์ชันเช็คว่า selectedDate ตรงกับวันที่ที่ถูกปิดไว้หรือไม่
+  const isBlockedDate = (date) => {
+    const day = date.getDate().toString().padStart(2, "0"); // แปลงวันที่เป็นสตริงในรูปแบบ "01", "22" ฯลฯ
+    return blockedDates.includes(day);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 w-[353px] h-fit">
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-2">
         <FaCalendarAlt className="w-[17px] h-[17px] text-lightblack mr-2" />
         <DatePicker
           selected={selectedDate}
@@ -86,8 +106,17 @@ const EventInfoCard = ({ id }) => {
           dateFormat="MMMM d, yyyy"
           className="paragraph2 text-lightblack"
           placeholderText="Select Date"
+          filterDate={(date) => !isBlockedDate(date)} // ฟิลเตอร์วันหยุด
+          dayClassName={(date) =>
+            isBlockedDate(date) ? "bg-gray-200 cursor-not-allowed" : "" // กำหนดคลาสให้กับวันที่ปิด
+          }
         />
       </div>
+
+      {/* แสดงข้อความแจ้งเตือนสีแดง */}
+      {showDateError && (
+        <p className="text-red-500 text-sm mb-4">Please select a date before reserving.</p>
+      )}
 
       <div className="flex items-center mb-4">
         <FaClock className="w-[17px] h-[17px] text-lightblack mr-2" />
@@ -135,10 +164,9 @@ const EventInfoCard = ({ id }) => {
         </button>
       </div>
 
-      {/* ปุ่ม "Reserve" */}
       <div className="mt-6">
         <button
-          onClick={handleReserveClick} 
+          onClick={handleReserveClick}
           className="bg-primary text-white py-3 w-full rounded-[30px] search"
         >
           Reserve
