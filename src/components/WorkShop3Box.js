@@ -1,7 +1,7 @@
 import "../styles.css";
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase"; // ดึง Firebase ที่ตั้งค่าไว้
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import WorkshopRecommendationBox from "./WorkshopRecomendationBox";
 
 function WorkShop3Box() {
@@ -12,12 +12,9 @@ function WorkShop3Box() {
       try {
         // อ้างอิง collection event ใน Firestore
         const eventRef = collection(db, "event");
-        
-        // Query สำหรับดึงข้อมูลเฉพาะจังหวัด
-        const q = query(
-          eventRef,
-          where("provNameEN", "in", ["Ang Thong"])
-        );
+
+        // Query สำหรับดึงข้อมูลเรียงตาม rating มากไปน้อย และจำกัด 4 อีเวนต์
+        const q = query(eventRef, orderBy("rating", "desc"), limit(4)); // เรียงลำดับตาม rating มากไปหาน้อย และจำกัด 3 รายการ
 
         const querySnapshot = await getDocs(q);
 
@@ -30,19 +27,7 @@ function WorkShop3Box() {
           }
         });
 
-        // จัดกลุ่มข้อมูล และดึงมาเพียงจังหวัดละ 3 อีเวนต์
-        const groupedEvents = {};
-        eventList.forEach((event) => {
-          if (!groupedEvents[event.provNameEN]) {
-            groupedEvents[event.provNameEN] = [];
-          }
-          groupedEvents[event.provNameEN].push(event);
-        });
-
-        const finalEvents = Object.values(groupedEvents)
-          .flatMap((events) => events.slice(0, 3)); // ดึงมาเพียง 3 อีเวนต์ต่อจังหวัด
-        
-        setEvents(finalEvents);
+        setEvents(eventList); // เก็บข้อมูลที่ได้ใน state
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -51,6 +36,19 @@ function WorkShop3Box() {
     fetchEvents();
   }, []);
 
+  // ฟังก์ชันสำหรับเลื่อนไปที่ด้านบนสุด
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth" // ใช้ smooth scrolling
+    });
+  };
+
+  // ฟังก์ชันที่เรียกเมื่อคลิกที่ WorkshopRecommendationBox
+  const handleBoxClick = () => {
+    scrollToTop(); // เลื่อนไปที่ด้านบนสุด
+  };
+
   return (
     <div className="px-20">
       <div className="flex justify-center">
@@ -58,13 +56,14 @@ function WorkShop3Box() {
       </div>
       <div className="grid grid-cols-3 gap-4 mt-8">
         {events.map((event) => (
-          <WorkshopRecommendationBox
-            key={event.id}
-            image={event.bannerImage}
-            title={event.eventNameEN}
-            location={`${event.ampNameEN}, ${event.provNameEN}`}
-            id={event.id}
-          />
+          <div key={event.id} onClick={handleBoxClick}>
+            <WorkshopRecommendationBox
+              image={event.bannerImage}
+              title={event.eventNameEN}
+              location={`${event.ampNameEN}, ${event.provNameEN}`}
+              id={event.id}
+            />
+          </div>
         ))}
       </div>
     </div>
