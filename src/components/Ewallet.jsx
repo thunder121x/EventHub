@@ -10,8 +10,15 @@ import visa from "../assets/VISA.png";
 import LeftNav from "./LeftNav";
 
 import { auth, db } from "../firebase"; // Ensure Firebase setup is imported
-import { doc, getDoc, updateDoc,setDoc } from "firebase/firestore";
-
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  setDoc,
+  collection,
+  query,
+  getDocs,
+} from "firebase/firestore";
 
 const SuccessModal = ({ isOpen, onClose, amount }) => {
   if (!isOpen) return null;
@@ -103,20 +110,20 @@ const Credit = ({ isOpen, onClose }) => {
 
     const user = auth.currentUser;
     if (user) {
-      const maskedCard = cardNumber; // Mask card for privacy
-      const userRef = doc(db, "users", user.uid, "verified_cards", maskedCard);
+      const maskedCard = cardNumber.slice(-4); // Mask card for privacy
+      const userRef = doc(db, "users", user.uid, "verified_cards", cardNumber);
 
-await setDoc(
-  doc(db, "users", user.uid, "verified_cards", maskedCard),
-  {
-    cardNumber: `**** **** **** ${maskedCard}`,
-    exp,
-    cvv,
-    nameOnCard,
-    verifiedAt: new Date(),
-  },
-  { merge: true } // Ensures only specified fields are added/updated
-);
+      await setDoc(
+        userRef,
+        {
+          cardNumber: `**** **** **** ${maskedCard.split()}`,
+          exp,
+          cvv,
+          nameOnCard,
+          verifiedAt: new Date(),
+        },
+        { merge: true } // Ensures only specified fields are added/updated
+      );
 
       return true; // Verification successful
     } else {
@@ -273,34 +280,65 @@ const EWallet = () => {
     const user = auth.currentUser;
     setSelectedAmount(amount);
     setIsProcessing(true);
-  
+
+    // Reference to the "verified_cards" collection
+    const cardsCollectionRef = collection(
+      db,
+      "users",
+      user.uid,
+      "verified_cards"
+    );
+
     try {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userRef);
-  
-        if (userDoc.exists()) {
-          const currentBalance = userDoc.data().pocket_money || 0;
-          const updatedBalance = currentBalance + amount;
-  
-          // ใช้ merge: true เพื่อไม่ให้ข้อมูลที่มีอยู่ใน users ถูกลบ
-          await setDoc(userRef, { pocket_money: updatedBalance }, { merge: true });
-          setWalletBalance(updatedBalance);
+      // Query the collection to get all documents
+      const querySnapshot = await getDocs(cardsCollectionRef);
+
+      if (!querySnapshot.empty) {
+        console.log("At least one card exists!");
+        querySnapshot.forEach((doc) => {
+          console.log("Card data:", doc.id, doc.data());
+        });
+
+        try {
+          if (user) {
+            const userRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (userDoc.exists()) {
+              const currentBalance = userDoc.data().pocket_money || 0;
+              const updatedBalance = currentBalance + amount;
+
+              // ใช้ merge: true เพื่อไม่ให้ข้อมูลที่มีอยู่ใน users ถูกลบ
+              await setDoc(
+                userRef,
+                { pocket_money: updatedBalance },
+                { merge: true }
+              );
+              setWalletBalance(updatedBalance);
+              setIsProcessing(false);
+              setIsSuccess(true);
+            } else {
+              throw new Error("User document does not exist.");
+            }
+          } else {
+            throw new Error("No authenticated user found.");
+          }
+        } catch (error) {
+          console.error("Error processing top-up:", error);
           setIsProcessing(false);
-          setIsSuccess(true);
-        } else {
-          throw new Error("User document does not exist.");
+          setIsFailed(true);
         }
       } else {
-        throw new Error("No authenticated user found.");
+        console.log("No cards found!");
+          setIsProcessing(false);
+          setIsFailed(true);
       }
     } catch (error) {
-      console.error("Error processing top-up:", error);
-      setIsProcessing(false);
-      setIsFailed(true);
+      console.error("Error checking cards collection:", error);
+          setIsProcessing(false);
+          setIsFailed(true);
     }
   };
-  
 
   const handleSuccessClose = () => {
     setIsSuccess(false);
@@ -402,6 +440,5 @@ const EWallet = () => {
     </div>
   );
 };
-
 
 export default EWallet;
