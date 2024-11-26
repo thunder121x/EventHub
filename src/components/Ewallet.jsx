@@ -56,16 +56,17 @@ const FailModal = ({ isOpen, onClose, amount }) => {
           <img src={failed} alt="Success" className="w-16 h-16" />
         </div>
 
-        <h2 className="heading2 text-text mb-2">Top Up Fail T-T</h2>
-        <p className="paragraph1 text-lightgray mb-4">
-          {amount} Baht has been added to your wallet.
+        <h2 className="heading2 text-text mb-2">Payment Failed</h2>
+        <p className="paragraph3 text-gray mb-4">
+          There is an issue with the payment process, the money cannot be added
+          to your account at this time.
         </p>
 
         <button
           onClick={onClose}
-          className="w-full px-6 py-3 rounded-full bg-primary text-white hover:bg-opacity-90"
+          className=" px-8 py-3 rounded-full bg-primary heading3 text-white hover:bg-opacity-90"
         >
-          Done
+          Back
         </button>
       </div>
     </div>
@@ -253,28 +254,53 @@ const EWallet = () => {
   const [isFailed, setIsFailed] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState(0);
   const [walletBalance, setWalletBalance] = useState(null);
+  const [availableCard, setAvailableCard] = useState(null);
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Credit Modal state
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userRef);
 
-        if (userDoc.exists()) {
-          setUser(userDoc.data());
-          setWalletBalance(userDoc.data().pocket_money || 0);
+    useEffect(() => {
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const userRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userRef);
+
+          if (userDoc.exists()) {
+            setUser(userDoc.data());
+            setWalletBalance(userDoc.data().pocket_money || 0);
+          } else {
+            console.log("User data not found in Firestore");
+          }
+
+          const cardsCollectionRef = collection(
+            db,
+            "users",
+            user.uid,
+            "verified_cards"
+          );
+
+      // Query the collection to get all documents
+      const querySnapshot = await getDocs(cardsCollectionRef);
+          // if (!querySnapshot.empty) {
+          //   console.log("At least one card exists!");
+          //   querySnapshot.forEach((doc) => {
+          //     console.log("Card data:", doc.id, doc.data());
+          //   });
+          //   setAvailableCard(true);
+          // }
+                try {
+                  const querySnapshot = await getDocs(cardsCollectionRef);
+                  setAvailableCard(querySnapshot.size || 0);
+                } catch (error) {
+                  console.error("Error fetching cards:", error);
+                }
         } else {
-          console.log("User data not found in Firestore");
+          setUser(null);
         }
-      } else {
-        setUser(null);
-      }
-    });
+      });
 
-    return () => unsubscribe();
-  }, []);
+      return () => unsubscribe();
+    }, []);
 
   const handleTopUp = async (amount) => {
     const user = auth.currentUser;
@@ -340,6 +366,7 @@ const EWallet = () => {
     }
   };
 
+  
   const handleSuccessClose = () => {
     setIsSuccess(false);
     setIsFailed(false);
@@ -350,6 +377,8 @@ const EWallet = () => {
     setIsModalOpen(false);
     alert("Card added successfully!");
   };
+  
+
 
   return (
     <div className="min-h-screen bg-whitex font-sans">
@@ -414,12 +443,27 @@ const EWallet = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm mt-14">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-primary heading2">My Wallet</h2>
-                  <button
-                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90"
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    Add Card
-                  </button>
+                  {availableCard !== 0 ? (
+                    <div className="flex flex-row">
+                      <p className="paragraph2">
+                        {availableCard} Available Card{" "}
+                      </p>
+
+                      <button
+                        className="bg-white text-black rounded-lg px-2 paragraph2 hover:bg-opacity-90"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Add Card
+                    </button>
+                  )}
                 </div>
                 <p className="flex justify-end text-4xl font-bold mb-6">
                   {walletBalance !== null ? walletBalance : "?"} Baht
