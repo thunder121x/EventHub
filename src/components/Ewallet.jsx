@@ -103,11 +103,6 @@ const Credit = ({ isOpen, onClose }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   const verifyCard = async ({ cardNumber, exp, cvv, nameOnCard }) => {
-    // const isValidCard = luhnCheck(cardNumber) && exp && cvv && nameOnCard;
-
-    // if (!isValidCard) {
-    //   throw new Error("Invalid card details. Please check your input.");
-    // }
 
     const user = auth.currentUser;
     if (user) {
@@ -132,24 +127,6 @@ const Credit = ({ isOpen, onClose }) => {
     }
   };
 
-  const luhnCheck = (cardNumber) => {
-    let sum = 0;
-    let shouldDouble = false;
-
-    for (let i = cardNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(cardNumber[i]);
-
-      if (shouldDouble) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
-
-      sum += digit;
-      shouldDouble = !shouldDouble;
-    }
-
-    return sum % 10 === 0;
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -280,6 +257,88 @@ const Credit = ({ isOpen, onClose }) => {
     </div>
   );
 };
+
+const VerifiedCards = ({ isOpen, onClose }) => {
+  const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchVerifiedCards();
+    }
+  }, [isOpen]);
+
+  const fetchVerifiedCards = async () => {
+    const user = auth.currentUser;
+    setIsLoading(true);
+
+    try {
+      if (user) {
+        const cardsRef = collection(db, "users", user.uid, "verified_cards");
+        const querySnapshot = await getDocs(cardsRef);
+
+        const cardsList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setCards(cardsList);
+      } else {
+        throw new Error("User not authenticated");
+      }
+    } catch (error) {
+      console.error("Error fetching verified cards:", error);
+      alert("Failed to fetch verified cards.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-8 w-[500px]">
+        <h2 className="heading2 text-text mb-6">Verified Cards</h2>
+
+        {isLoading ? (
+          <p className="paragraph2 text-center">Loading...</p>
+        ) : cards.length > 0 ? (
+          <ul className="space-y-4">
+            {cards.map((card) => (
+              <li
+                key={card.id}
+                className="flex justify-between items-center p-4 border border-lightgray rounded-lg"
+              >
+                <div>
+                  <p className="paragraph2 font-bold">{card.cardNumber}</p>
+                  <p className="paragraph3 text-lightgray">
+                    {card.nameOnCard} - Exp: {card.exp}
+                  </p>
+                </div>
+                <p className="paragraph2 text-lightgray">
+                  Verified on {new Date(card.verifiedAt.seconds * 1000).toLocaleDateString()}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="paragraph2 text-center">No verified cards found.</p>
+        )}
+
+        <div className="flex justify-end gap-4 mt-6">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 rounded-full border border-lightgray hover:bg-lightgray-50"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const EWallet = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -289,6 +348,7 @@ const EWallet = () => {
   const [availableCard, setAvailableCard] = useState(null);
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Credit Modal state
+  const [isModalVeri, setIsModalVeri] = useState(false);
 
 
     useEffect(() => {
@@ -321,7 +381,6 @@ const EWallet = () => {
           //   setAvailableCard(true);
           // }
                 try {
-                  const querySnapshot = await getDocs(cardsCollectionRef);
                   setAvailableCard(querySnapshot.size || 0);
                 } catch (error) {
                   console.error("Error fetching cards:", error);
@@ -438,6 +497,11 @@ const EWallet = () => {
         onSave={handleSave}
       />
 
+      <VerifiedCards
+        isOpen={isModalVeri}
+        onClose={() => setIsModalVeri(false)}
+      />
+
       <div className="flex">
         {/* Left Sidebar */}
         <LeftNav />
@@ -477,9 +541,12 @@ const EWallet = () => {
                   <h2 className="text-primary heading2">My Wallet</h2>
                   {availableCard !== 0 ? (
                     <div className="flex flex-row">
-                      <p className="paragraph2">
+                      <button
+                        className="paragraph2"
+                        onClick={() => setIsModalVeri(true)}
+                      >
                         {availableCard} Available Card{" "}
-                      </p>
+                      </button>
 
                       <button
                         className="bg-white text-black rounded-lg px-2 paragraph2 hover:bg-opacity-90"
