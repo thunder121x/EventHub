@@ -102,7 +102,7 @@ const Sign_up = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  placeholder="John"
+                  placeholder=""
                   className="w-full px-4 py-3 rounded-lg border border-lightgray shadow-md"
                   required
                 />
@@ -114,7 +114,7 @@ const Sign_up = () => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  placeholder="Doe"
+                  placeholder=""
                   className="w-full px-4 py-3 rounded-lg border border-lightgray shadow-md"
                   required
                 />
@@ -127,7 +127,7 @@ const Sign_up = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="JohnDoe@gmail.com"
+                placeholder=""
                 className="w-full px-4 py-3 rounded-lg border border-lightgray shadow-md"
                 required
               />
@@ -138,7 +138,7 @@ const Sign_up = () => {
                 name="phoneNum"
                 value={formData.phoneNum}
                 onChange={handleChange}
-                placeholder="084 123 4567"
+                placeholder=""
                 className="w-full px-4 py-3 rounded-lg border border-lightgray shadow-md"
                 required
               />
@@ -180,7 +180,7 @@ const Sign_up = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Password"
+                placeholder=""
                 className="w-full px-4 py-3 rounded-lg border border-lightgray shadow-md"
                 required
               />
