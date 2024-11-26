@@ -171,14 +171,35 @@ const Credit = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-lg p-8 w-[500px]">
         <h2 className="heading2 text-text mb-6">Add Credit/Debit Card</h2>
 
+        <div className="mb-6">
+          <div className="flex justify-between gap-2 mb-4">
+            <div className="flex justify-start gap-3 items-center heading3">
+              <img src={Card} alt="Card" className=" w-8 h-8" />
+              Card Information
+            </div>
+            <div className="flex justify-end gap-33 items-center">
+              <img src={jcb} alt="JCB" className="h-8 p-1" />
+              <img src={visa} alt="Visa" className="h-8 p-1" />
+              <img src={Mastercard} alt="Mastercard" className="h-8 p-1" />
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-4">
           <div>
             <label className="block paragraph2 mb-1">Card number</label>
             <input
               type="text"
-              placeholder="1234 5678 9123 4567"
+              placeholder="0000 0000 0000 0000"
               value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+                const formattedValue = value
+                  .replace(/(\d{4})(?=\d)/g, "$1 ")
+                  .trim(); // Format as "#### #### #### ####"
+                setCardNumber(formattedValue);
+              }}
+              maxLength={19} // 16 digits + 3 spaces
               className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
@@ -190,7 +211,17 @@ const Credit = ({ isOpen, onClose }) => {
                 type="text"
                 placeholder="MM / YY"
                 value={exp}
-                onChange={(e) => setExp(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                    .replace(/\D/g, "") // Remove non-digits
+                    .slice(0, 4); // Limit to 4 digits
+                  const formattedValue = value.replace(
+                    /(\d{2})(?=\d)/g,
+                    "$1 / "
+                  ); // Format as "MM / YY"
+                  setExp(formattedValue);
+                }}
+                maxLength={7} // MM / YY including spaces
                 className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
               />
             </div>
@@ -198,8 +229,9 @@ const Credit = ({ isOpen, onClose }) => {
               <label className="block paragraph2 mb-1">CVV</label>
               <input
                 type="text"
-                placeholder="123"
+                placeholder="000"
                 value={cvv}
+                maxLength={3}
                 onChange={(e) => setCvv(e.target.value)}
                 className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
               />
@@ -210,14 +242,14 @@ const Credit = ({ isOpen, onClose }) => {
             <label className="block paragraph2 mb-1">Name on Card</label>
             <input
               type="text"
-              placeholder="John Doe"
+              placeholder=""
               value={nameOnCard}
               onChange={(e) => setNameOnCard(e.target.value)}
               className="w-full p-2 border border-lightgray rounded-lg focus:outline-none focus:border-primary"
             />
           </div>
 
-          <p className="paragraph2 text-lightgray mt-4">
+          <p className="paragraph3 text-lightgray mt-4">
             The system will deduct 1 baht from your card for identity
             verification. You will receive this amount back within 14 business
             days.
